@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
