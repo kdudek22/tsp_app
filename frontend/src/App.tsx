@@ -1,5 +1,6 @@
-import { MapContainer, TileLayer, Marker, useMapEvents, Popup} from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, Polyline} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
 import { useState } from 'react';
 
 
@@ -36,16 +37,15 @@ function App() {
           {waypoints.map((waypoint, index) => (
             <Marker position={waypoint}></Marker>
           ))}
+          {waypoints.length >= 2 && <Polyline positions={waypoints} color="gray" />}
 
         </MapContainer>
       </div>
-      <div className="absolute top-0 left-0 z-50 h-screen" style={{zIndex: 999}}>
-        <div className='my-20 overflow-y-scroll'>
-          <div className="">
-            {waypoints.map((waypoint, index) => (
-                <p>Waypoint: {index} {waypoint.lat} - {waypoint.lng}</p>
-              ))}
-          </div>
+      <div className="absolute top-0 left-0 z-50 h-screen py-12 ps-3" style={{zIndex: 999}}>
+        <div className="overflow-auto max-h-full" style={{background: "rgba(255, 255, 255, 0.5)"}}>
+          {waypoints.map((waypoint, index) => (
+              <p className="py-8">Waypoint: {index} {waypoint.lat} - {waypoint.lng}</p>
+            ))}
         </div>
       </div>
     </>
