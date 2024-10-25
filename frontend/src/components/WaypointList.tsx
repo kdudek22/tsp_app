@@ -1,20 +1,21 @@
-import Waypoint from "./Waypoint";
+import { Waypoint } from "../interfaces/Interfaces";
+import WaypointElement from "./WaypointElement";
 
 type Props = {
-    waypoints: L.LatLng[]
-    updateWaypoints: (waypoints: L.LatLng[]) => void
+    waypoints: Waypoint[]
+    updateWaypoints: (waypoints: Waypoint[]) => void
 }
 
 function WaypointList({waypoints, updateWaypoints}: Props) {
 
-    const onWaypointDelete = (waypointId: number) => {
-        updateWaypoints(waypoints.filter(w => w.id))
+    const onWaypointDelete = (waypointId: string) => {
+        updateWaypoints(waypoints.filter(w => w.id !== waypointId))
     }
 
     return (
         <>
             {waypoints.map((waypoint, index) => (
-                <Waypoint waypoint={waypoint} id={index} key={index} onDeleteClicked={onWaypointDelete}></Waypoint>
+                <WaypointElement waypoint={waypoint} key={index} onDeleteClicked={onWaypointDelete}></WaypointElement>
             ))}
         </>
     );

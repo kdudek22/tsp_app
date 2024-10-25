@@ -5,6 +5,6 @@ export interface ClickListenerProps {
   }
 
 export interface Waypoint{
-    id: number
+    id: string
     latlang: L.LatLng
 }

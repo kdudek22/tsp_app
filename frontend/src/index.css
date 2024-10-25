@@ -5,3 +5,17 @@
 *{
     box-sizing: border-box;
 }
+
+.custom-marker {
+    background-color: rgb(158, 65, 225); /* Change this to any color */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.highlighted-marker{
+    background-color: yellow;
+}
