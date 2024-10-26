@@ -35,6 +35,18 @@ fun sendPostRequest(url: String, body: String): Response{
 @RequestMapping("/api")
 class TSPController {
 
+    @PostMapping("/duration_matrix")
+    fun getDurationMatrix(@RequestBody waypoints: List<Waypoint>): Map<String, Any> {
+        val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
+
+        val response = sendPostRequest("https://api.openrouteservice.org/v2/matrix/driving-car",
+            jacksonObjectMapper().writeValueAsString(mapOf("locations" to transformedWaypoints)))
+
+        val responseString = response.body?.string() ?: "No response body"
+
+        return mapOf("response" to responseString)
+    }
+
     @PostMapping("/test")
     fun testResponse(@RequestBody waypoints: List<Waypoint>): Map<String, Any> {
         val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
@@ -45,7 +57,7 @@ class TSPController {
 //        val responseString = response.body?.string() ?: "No response body"
 
         val response = sendPostRequest("https://api.openrouteservice.org/v2/directions/driving-car/geojson",
-            jacksonObjectMapper().writeValueAsString(mapOf("coordinates" to transformedWaypoints + arrayOf(transformedWaypoints.first()))))
+            jacksonObjectMapper().writeValueAsString(mapOf("coordinates" to transformedWaypoints + arrayOf(transformedWaypoints.first()), "radiuses" to arrayOf(-1))))
 
 
         val responseString = response.body?.string() ?: "No response body"

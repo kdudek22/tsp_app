@@ -6,5 +6,11 @@ export interface ClickListenerProps {
 
 export interface Waypoint{
     id: string
-    latlang: L.LatLng
+    latlang: LatLng
+}
+
+export interface Route {
+    id: string
+    color: string
+    points: LatLng[]
 }
