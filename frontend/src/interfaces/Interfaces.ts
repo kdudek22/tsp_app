@@ -1,16 +1,16 @@
-import { LatLng } from 'leaflet';
+import L from 'leaflet'
 
 export interface ClickListenerProps {
-    onClick: (latlng: LatLng) => void;
+    onClick: (latlng: L.LatLng) => void;
   }
 
 export interface Waypoint{
     id: string
-    latlang: LatLng
+    latlang: L.LatLng
 }
 
 export interface Route {
     id: string
     color: string
-    points: LatLng[]
+    points: L.LatLng[]
 }

@@ -25,9 +25,9 @@ const ClickListener = ({onClick}: ClickListenerProps) => {
 
 function App() {
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  const [displayedRoutes, setDisplayedRoutes] = useState<Route[]>([])
   const [displayedRoutePoints, setDisplayedRoutePoints] = useState<L.latlang>([])
   const [durationMatrix, setDurationMatrix] = useState([])
+  const [displayedRoutes, setDisplayedRoutes] = useState<Route[]>([])
 
   const addWaypoint = (waypoint: Waypoint) => {
     setWaypoints([...waypoints, waypoint])
@@ -96,8 +96,11 @@ function App() {
     setDisplayedRoutePoints(geometries.map(x => ({lat: x[1], lng: x[0]})))
   }
 
-  const updateDisplayedRoute = (points: any[]) => {
-    setDisplayedRoutePoints(points)
+  const updateDisplayedRoute = (route: Route) => {
+    console.log(route)
+    setDisplayedRoutes([...displayedRoutes, route])
+    // setDisplayedRoutePoints(route.points)
+    console.log(route.color)
     return true
   }
 
@@ -113,8 +116,14 @@ function App() {
           {waypoints.map((waypoint, index) => (
             <CustomMarker key={index} waypoint={waypoint}/>
           ))}
-          {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}
-          {displayedRoutePoints.length > 0 && <Polyline positions={displayedRoutePoints} color="#5CF64A"></Polyline>}
+
+          // this displays the route
+          {displayedRoutes.map((route, index) => (
+              <Polyline key={index} positions={route.points} color={route.color}></Polyline>
+          ))}
+          // this is the lines between the waypoints
+          {/*{waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}*/}
+
         </MapContainer>
       </div>
       <div className="absolute top-0 left-0 z-50 h-screen py-12 ps-3" style={{zIndex: 999}}>

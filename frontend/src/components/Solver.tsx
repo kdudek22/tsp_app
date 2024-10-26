@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react';
 import {ClipLoader} from "react-spinners";
-import {Waypoint} from "../interfaces/Interfaces.ts";
+import {Route, Waypoint} from "../interfaces/Interfaces.ts";
 import L from "leaflet";
 
 type Props = {
     durationMatrix: [],
     waypoints: Waypoint[],
-    requestToSetDisplayedRoute: (points: any[]) => boolean
+    requestToSetDisplayedRoute: (route: Route) => boolean
 }
 
 enum Status{
@@ -15,7 +15,7 @@ enum Status{
 
 const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) => {
     const name = "Naive Solver"
-    const color = "#5CF64A"
+    // const color = "#5CF64A"
 
 
     useEffect(() => {
@@ -23,7 +23,7 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
             solve()
         }
     }, [durationMatrix]);
-
+    const [route, setRoute] = useState<Route>()
 
     const [isRunning, setIsRunning] = useState(false)
     const [isFinished, setIsFinished] = useState(false)
@@ -34,6 +34,7 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
     const [solution, setSolution] = useState<number[]>([])
     const [solutionRoute, setSolutionRoute] = useState([])
     const [isDisplayed, setIsDisplayed] = useState(false)
+    const [color, setColor] = useState("#5CF64A")
 
 
       useEffect(() => {
@@ -82,8 +83,7 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
         const response = await sendPostRequest("http://127.0.0.1:8000/api/test", points)
 
         const data = await response.json()
-        const geometries: L.latlang[] = JSON.parse(data.response).features[0].geometry.coordinates
-
+        const geometries: [[number]] = JSON.parse(data.response).features[0].geometry.coordinates
         return geometries
     }
 
@@ -102,22 +102,32 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
         setStatus(Status.running)
         const solution = solveTSP()
         setSolution(solution)
-        const routePoints = await getRouteFromSolution(solution)
+        let routePoints = await getRouteFromSolution(solution)
         setSolutionRoute(routePoints)
-        setIsDisplayed(requestToSetDisplayedRoute(routePoints.map(x => ({lat: x[1], lng: x[0]}))))
+
+        const mappedPoints: L.latlang[] = routePoints.map(x => ({lat: x[1], lng: x[0]}))
+
+        console.log(mappedPoints[0].lat, mappedPoints[0].lng)
+
+        console.log(mappedPoints)
+
+        const route: Route = {id: "asd", color: color, points: mappedPoints}
+
+        setRoute(route)
+        setIsDisplayed(requestToSetDisplayedRoute(route))
         setStatus(Status.finished)
         setIsRunning(false)
     }
 
     const updateDisplayedRoute = () => {
-        if(isDisplayed){
-            requestToSetDisplayedRoute([])
-            setIsDisplayed(false)
-        }
-        else{
-            requestToSetDisplayedRoute(solutionRoute.map(x => ({lat: x[1], lng: x[0]})))
-            setIsDisplayed(true)
-        }
+        // if(isDisplayed){
+        //     requestToSetDisplayedRoute([])
+        //     setIsDisplayed(false)
+        // }
+        // else{
+        //     requestToSetDisplayedRoute(route)
+        //     setIsDisplayed(true)
+        // }
     }
 
     return (
@@ -129,6 +139,7 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
                     <p>Time to solve: {(seconds!== 0 && milliseconds !== 0) ? `${seconds}.${milliseconds}`: "NA"}</p>
                     <p>Cost: {calculateCost()}</p>
                     <p onClick={updateDisplayedRoute}>{isDisplayed ? "Hide": "Show"}</p>
+                    <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{setColor(e.target.value)}}/>
                 </div>
                 <div style={{ width: '50px', height: '50px' }}>
                     {isRunning && <ClipLoader size={20} />}
