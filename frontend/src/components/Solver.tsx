@@ -2,20 +2,21 @@ import {useEffect, useState} from 'react';
 import {ClipLoader} from "react-spinners";
 import {Route, Waypoint} from "../interfaces/Interfaces.ts";
 import L from "leaflet";
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
     durationMatrix: [],
     waypoints: Waypoint[],
-    requestToSetDisplayedRoute: (route: Route) => boolean
+    requestToAddToDisplayedRoutes: (route: Route) => boolean
+    requestToRemoveFromDisplayedRoutes: (id: string) => boolean
 }
 
 enum Status{
     idle="Idle", running="Running", finished="Finished"
 }
 
-const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) => {
+const Solver = ({durationMatrix, waypoints, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes}: Props) => {
     const name = "Naive Solver"
-    // const color = "#5CF64A"
 
 
     useEffect(() => {
@@ -33,8 +34,8 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [solution, setSolution] = useState<number[]>([])
     const [solutionRoute, setSolutionRoute] = useState([])
-    const [isDisplayed, setIsDisplayed] = useState(false)
-    const [color, setColor] = useState("#5CF64A")
+    const [isDisplayed, setIsDisplayed] = useState<boolean>(false)
+    const [color, setColor] = useState("#000000")
 
 
       useEffect(() => {
@@ -111,23 +112,25 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
 
         console.log(mappedPoints)
 
-        const route: Route = {id: "asd", color: color, points: mappedPoints}
+        const route: Route = {id: uuidv4(), color: color, points: mappedPoints}
 
         setRoute(route)
-        setIsDisplayed(requestToSetDisplayedRoute(route))
+        setIsDisplayed(requestToAddToDisplayedRoutes(route))
         setStatus(Status.finished)
         setIsRunning(false)
     }
 
     const updateDisplayedRoute = () => {
-        // if(isDisplayed){
-        //     requestToSetDisplayedRoute([])
-        //     setIsDisplayed(false)
-        // }
-        // else{
-        //     requestToSetDisplayedRoute(route)
-        //     setIsDisplayed(true)
-        // }
+        if(isDisplayed){
+            console.log("remove")
+            requestToRemoveFromDisplayedRoutes(route!.id)
+            setIsDisplayed(false)
+        }
+        else{
+            console.log("add")
+            requestToAddToDisplayedRoutes(route!)
+            setIsDisplayed(true)
+        }
     }
 
     return (
@@ -136,9 +139,9 @@ const Solver = ({durationMatrix, waypoints, requestToSetDisplayedRoute}: Props) 
             <div className="flex justify-between gap-3">
                 <div>
                     <p className="w-48">Status: {status}</p>
-                    <p>Time to solve: {(seconds!== 0 && milliseconds !== 0) ? `${seconds}.${milliseconds}`: "NA"}</p>
-                    <p>Cost: {calculateCost()}</p>
-                    <p onClick={updateDisplayedRoute}>{isDisplayed ? "Hide": "Show"}</p>
+                    <p>Time to solve: {(seconds!== 0 && milliseconds !== 0) ? `${seconds}.${milliseconds}`: "N/A"}</p>
+                    <p>Cost: {calculateCost() === 0? "N/A": calculateCost()}</p>
+                    <input type="checkbox" onClick={updateDisplayedRoute} checked={isDisplayed}/>
                     <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{setColor(e.target.value)}}/>
                 </div>
                 <div style={{ width: '50px', height: '50px' }}>

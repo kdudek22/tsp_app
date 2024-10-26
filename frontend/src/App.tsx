@@ -2,105 +2,42 @@ import { MapContainer, TileLayer, Marker, useMapEvents, Polyline} from 'react-le
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { useState } from 'react';
-import { icon, LeafletMouseEvent } from 'leaflet';
 import WaypointList from './components/WaypointList';
 import {Route, Waypoint} from './interfaces/Interfaces';
-import { v4 as uuidv4 } from 'uuid';
 import L from 'leaflet';
 import Solver from "./components/Solver.tsx";
-
-
-type ClickListenerProps = {
-  onClick: (latlng: Waypoint) => void
-}
-
-const ClickListener = ({onClick}: ClickListenerProps) => {
-  useMapEvents({
-    click(e: LeafletMouseEvent){
-      onClick({id:uuidv4(), latlang: e.latlng})
-    }
-  })
-  return null
-}
+import {requestService, mapServie} from "./services/services.ts";
+import CustomMarker from "./components/CustomMarker.tsx";
+import ClickListener from "./components/ClickListener.tsx";
 
 function App() {
+  // List of waypoints that are visible on the map, Waypoint components use the setter to remove waypoints
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  const [displayedRoutePoints, setDisplayedRoutePoints] = useState<L.latlang>([])
-  const [durationMatrix, setDurationMatrix] = useState([])
+
+  // List of routes that are displayed on the map
   const [displayedRoutes, setDisplayedRoutes] = useState<Route[]>([])
 
-  const addWaypoint = (waypoint: Waypoint) => {
-    setWaypoints([...waypoints, waypoint])
-  }
-
-  type MarkerProps = {
-    waypoint: Waypoint
-  }
-
-  const CustomMarker = ({waypoint}: MarkerProps) => {
-    const customIcon = L.divIcon({
-      className: `${waypoint.id} custom-marker`,
-      html: `<div id=${waypoint.id}></div>`,
-      iconSize: [20, 20]
-    })
-    return <Marker position={waypoint.latlang} icon={customIcon} id={waypoint.id}></Marker>
-  }
-
-  const sendPostRequest = async (url: string, body: any) => {
-    return await fetch(url, {
-      method: "POST",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(body)
-    })
-  }
-
-  const getRouteFromPoints = async (points: L.latlang) => {
-    const response = await sendPostRequest("http://127.0.0.1:8000/api/test", points)
-
-    const data = await response.json()
-    const geometries: L.latlang[] = JSON.parse(data.response).features[0].geometry.coordinates
-    return geometries
-  }
+  // The calculated cost matrix - after the routing procedure has been started
+  const [durationMatrix, setDurationMatrix] = useState([])
 
 
+  // This gets the durationMatrix from the api
   const getDurationMatrix = async () => {
     const transformedWaypoints = waypoints.map(waypoint => ({id: waypoint.id, lat: waypoint.latlang.lat, lng: waypoint.latlang.lng}))
 
-    const response = await sendPostRequest("http://127.0.0.1:8000/api/duration_matrix", transformedWaypoints)
+    const response = await requestService.post("http://127.0.0.1:8000/api/duration_matrix", transformedWaypoints)
 
     const data = await response.json()
-    const matrix = JSON.parse(data.response).durations
-    setDurationMatrix(matrix)
-
-    // const solver_response = await sendPostRequest("http://127.0.0.1:5000/solve", {matrix: matrix})
-    //
-    // const solver_data = await solver_response.json()
-    // const points_order: number[] = solver_data.solution
-    // console.log(solver_data.solution)
-    //
-    // const route = await getRouteFromPoints(points_order.map(p => transformedWaypoints[p]))
-    // setDurationMatrix(matrix)
-    // console.log(route)
-    // setRoutePoints(route.map(x => ({lat: x[1], lng: x[0]})))
+    setDurationMatrix(JSON.parse(data.response).durations)
   }
 
-  const sendRouteRequest = async () => {
-    const transformedWaypoints = waypoints.map(waypoint => ({id: waypoint.id, lat: waypoint.latlang.lat, lng: waypoint.latlang.lng}))
-    console.log(transformedWaypoints)
-
-    const response = await sendPostRequest("http://127.0.0.1:8000/api/test", transformedWaypoints)
-
-    const data = await response.json()
-    console.log(data.response)
-    const geometries: L.latlang[] = JSON.parse(data.response).features[0].geometry.coordinates
-    setDisplayedRoutePoints(geometries.map(x => ({lat: x[1], lng: x[0]})))
-  }
-
-  const updateDisplayedRoute = (route: Route) => {
-    console.log(route)
+  const updateDisplayedRoutes = (route: Route) => {
     setDisplayedRoutes([...displayedRoutes, route])
-    // setDisplayedRoutePoints(route.points)
-    console.log(route.color)
+    return true
+  }
+
+  const removeRouteFromDisplayedRoutes = (routeId: string) => {
+    setDisplayedRoutes(displayedRoutes.filter(r => r.id !== routeId))
     return true
   }
 
@@ -112,7 +49,7 @@ function App() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <ClickListener onClick={addWaypoint}/>
+          <ClickListener onClick={(waypoint) => setWaypoints([...waypoints, waypoint])}/>
           {waypoints.map((waypoint, index) => (
             <CustomMarker key={index} waypoint={waypoint}/>
           ))}
@@ -122,7 +59,7 @@ function App() {
               <Polyline key={index} positions={route.points} color={route.color}></Polyline>
           ))}
           // this is the lines between the waypoints
-          {/*{waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}*/}
+          {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}
 
         </MapContainer>
       </div>
@@ -136,7 +73,7 @@ function App() {
       </div>
       <div className="absolute top-0 right-0 py-8 px-4 flex flex-col" style={{background: "rgba(255, 255, 255, 0.5)", zIndex: 999}}>
         <h2>Solvers:</h2>
-        <Solver requestToSetDisplayedRoute={updateDisplayedRoute} waypoints={waypoints} durationMatrix={durationMatrix}/>
+        <Solver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
       </div>
     </>
   )
