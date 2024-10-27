@@ -4,6 +4,8 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import { useState } from 'react';
 import WaypointList from './components/WaypointList';
 import {Route, Waypoint} from './interfaces/Interfaces';
+import {ArrowUturnLeftIcon, Cog6ToothIcon} from "@heroicons/react/24/outline";
+
 
 import Solver from "./components/solvers/Solver.tsx";
 import {requestService} from "./services/services.ts";
@@ -11,6 +13,8 @@ import CustomMarker from "./components/CustomMarker.tsx";
 import ClickListener from "./components/ClickListener.tsx";
 import BasicSolver from "./components/solvers/BasicSolver.tsx";
 import PythonSolver from "./components/solvers/PythonSolver.tsx";
+import Settings from "./components/Settings.tsx";
+import BottomMenu from "./components/BottomMenu.tsx";
 
 
 function App() {
@@ -52,6 +56,11 @@ const updateDisplayedRoutes = (route: Route) => {
     setDisplayedRoutes(displayedRoutes.filter(r => r.id !== routeId))
   }
 
+  const addWaypoint = (waypoint) => {
+    waypoint = {...waypoint, orderNumber: waypoints.length}
+    setWaypoints([...waypoints, waypoint])
+  }
+
   return (
     <>
       <div className='w-screen h-screen flex justify-center relative'>
@@ -60,9 +69,9 @@ const updateDisplayedRoutes = (route: Route) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <ClickListener onClick={(waypoint) => setWaypoints([...waypoints, waypoint])}/>
+          <ClickListener onClick={(waypoint) => addWaypoint(waypoint)}/>
           {waypoints.map((waypoint, index) => (
-            <CustomMarker key={index} waypoint={waypoint}/>
+            <CustomMarker orderNumber={waypoint.orderNumber!} key={index} waypoint={waypoint}/>
           ))}
 
           // this displays the route
@@ -74,15 +83,27 @@ const updateDisplayedRoutes = (route: Route) => {
 
         </MapContainer>
       </div>
-      <div className="absolute top-0 left-0 z-50 h-screen py-12 ps-3" style={{zIndex: 999}}>
-        <div className="overflow-auto max-h-full" style={{background: "rgba(255, 255, 255, 0.5)"}}>
-          <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>
+      <div className="absolute top-0 left-0 z-50 py-24 ps-3" style={{zIndex: 500}}>
+        <div>
+          <div>
+            <Settings/>
+          </div>
+          <div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>
+            <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>
+          </div>
         </div>
+
       </div>
-      <div className='absolute bottom-0 w-screen py-8 flex justify-center' style={{background: "rgba(255, 255, 255, 0.5)", zIndex: 999}}>
-        <button className='bg-green-600 disabled:bg-gray-400 disabled:text-gray-600 py-2 px-6 rounded-xl text-2xl text-white' disabled={waypoints.length < 2} onClick={getDurationMatrix}>Route</button>
+      <div className="absolute bottom-0" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
+        <BottomMenu onClick={getDurationMatrix} disableButton={waypoints.length < 2}/>
       </div>
-      <div className="absolute top-0 right-0 py-8 px-4 flex flex-col" style={{background: "rgba(255, 255, 255, 0.5)", zIndex: 999}}>
+
+
+
+      {/*<div className='absolute bottom-0 w-screen py-8 flex justify-center'>*/}
+      {/*  <button className='bg-green-600 disabled:bg-gray-400 disabled:text-gray-600 py-2 px-6 rounded-xl text-2xl text-white' style={{zIndex: 500}} disabled={waypoints.length < 2} onClick={getDurationMatrix}>Route</button>*/}
+      {/*</div>*/}
+      <div className="absolute top-0 right-0 py-8 px-4 flex flex-col" style={{background: "rgba(255, 255, 255, 0.5)", zIndex: 500}}>
         <h2>Solvers:</h2>
         {/*<Solver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>*/}
         <BasicSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>

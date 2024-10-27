@@ -4,12 +4,13 @@ import {Marker} from "react-leaflet";
 
 type MarkerProps = {
     waypoint: Waypoint
+    orderNumber: number
   }
 
-  const CustomMarker = ({waypoint}: MarkerProps) => {
+  const CustomMarker = ({waypoint, orderNumber}: MarkerProps) => {
     const customIcon = L.divIcon({
       className: `${waypoint.id} custom-marker`,
-      html: `<div id=${waypoint.id}>1</div>`,
+      html: `<div id=${waypoint.id}>${orderNumber}</div>`,
       iconSize: [20, 20]
     })
     return <Marker position={waypoint.latlang} icon={customIcon} id={waypoint.id}></Marker>

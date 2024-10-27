@@ -3,6 +3,7 @@ import L from 'leaflet'
 export interface Waypoint{
     id: string
     latlang: L.LatLng
+    orderNumber?: number
 }
 
 export interface Route {
