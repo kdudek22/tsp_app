@@ -1,14 +1,17 @@
-import { MapContainer, TileLayer, Marker, useMapEvents, Polyline} from 'react-leaflet';
+import { MapContainer, TileLayer, Polyline} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { useState } from 'react';
 import WaypointList from './components/WaypointList';
 import {Route, Waypoint} from './interfaces/Interfaces';
-import L from 'leaflet';
-import Solver from "./components/Solver.tsx";
-import {requestService, mapServie} from "./services/services.ts";
+
+import Solver from "./components/solvers/Solver.tsx";
+import {requestService} from "./services/services.ts";
 import CustomMarker from "./components/CustomMarker.tsx";
 import ClickListener from "./components/ClickListener.tsx";
+import BasicSolver from "./components/solvers/BasicSolver.tsx";
+import PythonSolver from "./components/solvers/PythonSolver.tsx";
+
 
 function App() {
   // List of waypoints that are visible on the map, Waypoint components use the setter to remove waypoints
@@ -18,7 +21,7 @@ function App() {
   const [displayedRoutes, setDisplayedRoutes] = useState<Route[]>([])
 
   // The calculated cost matrix - after the routing procedure has been started
-  const [durationMatrix, setDurationMatrix] = useState([])
+  const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
 
 
   // This gets the durationMatrix from the api
@@ -31,14 +34,22 @@ function App() {
     setDurationMatrix(JSON.parse(data.response).durations)
   }
 
-  const updateDisplayedRoutes = (route: Route) => {
-    setDisplayedRoutes([...displayedRoutes, route])
-    return true
-  }
+  // this is responsible for updating the displayed routes, also used in color changing
+const updateDisplayedRoutes = (route: Route) => {
+  setDisplayedRoutes(prevDisplayedRoutes => {
+    if (prevDisplayedRoutes.some(r => r.id === route.id)) {
+      return prevDisplayedRoutes.map(r =>
+        r.id === route.id ? { ...r, color: route.color } : r
+      );
+    } else {
+
+      return [...prevDisplayedRoutes, route];
+    }
+  });
+};
 
   const removeRouteFromDisplayedRoutes = (routeId: string) => {
     setDisplayedRoutes(displayedRoutes.filter(r => r.id !== routeId))
-    return true
   }
 
   return (
@@ -56,7 +67,7 @@ function App() {
 
           // this displays the route
           {displayedRoutes.map((route, index) => (
-              <Polyline key={index} positions={route.points} color={route.color}></Polyline>
+              <Polyline key={route.id + route.color} positions={route.points} color={route.color}></Polyline>
           ))}
           // this is the lines between the waypoints
           {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}
@@ -73,7 +84,9 @@ function App() {
       </div>
       <div className="absolute top-0 right-0 py-8 px-4 flex flex-col" style={{background: "rgba(255, 255, 255, 0.5)", zIndex: 999}}>
         <h2>Solvers:</h2>
-        <Solver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
+        {/*<Solver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>*/}
+        <BasicSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
+        <PythonSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
       </div>
     </>
   )

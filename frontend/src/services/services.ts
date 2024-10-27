@@ -16,11 +16,3 @@ class RequestService{
 }
 
 export const requestService= new RequestService();
-
-class MapService{
-    transformPoints(){
-        return ""
-    }
-}
-
-export const mapServie= new MapService()
