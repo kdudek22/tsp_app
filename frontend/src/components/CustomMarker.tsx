@@ -1,6 +1,8 @@
 import {Waypoint} from "../interfaces/Interfaces.ts";
 import L from "leaflet";
 import {Marker} from "react-leaflet";
+import {FlagIcon} from "@heroicons/react/24/outline";
+
 
 type MarkerProps = {
     waypoint: Waypoint

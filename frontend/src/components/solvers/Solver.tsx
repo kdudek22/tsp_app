@@ -94,15 +94,17 @@ const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, reques
 
 
     return (
-        <div className="flex flex-col text-xs">
+        <div className="flex flex-col text-xs py-3 px-4">
             <h2 className="font-bold">{name}</h2>
             <div className="flex justify-between gap-3">
                 <div>
-                    <p className="w-48">Status: {status}</p>
+                    <p className="w-32">Status: {status}</p>
                     <p>Time to solve: {timeElapsed !== 0 ? `${Math.floor(timeElapsed/1000)}.${timeElapsed%1000}`: "N/A"}</p>
                     <p>Cost: {route == undefined ? "N/A": route.totalCost}</p>
-                    <input disabled={ status!== Status.finished} type="checkbox" onChange={toggleDisplayRoute} checked={isDisplayed}/>
-                    <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{updateRouteColor(e.target.value)}}/>
+                    <div className="flex items-center">
+                        <input disabled={ status!== Status.finished} type="checkbox" onChange={toggleDisplayRoute} checked={isDisplayed}/>
+                        <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{updateRouteColor(e.target.value)}}/>
+                    </div>
                 </div>
                 <div style={{ width: '50px', height: '50px' }}>
                     {isRunning && <ClipLoader size={20} />}

@@ -22,8 +22,8 @@ function WaypointElement({waypoint, onDeleteClicked}: Props) {
     }
 
     return (
-        <div onMouseEnter={handleMouseOver} onMouseLeave={handleMouseLeave} style={{background: isHovered? "rgba(255, 255, 255, 0.6)": "", position: "relative"}}>
-            <p className="py-8 px-4"><strong>Waypoint:</strong></p>
+        <div className="w-32" onMouseEnter={handleMouseOver} onMouseLeave={handleMouseLeave} style={{background: isHovered? "rgba(255, 255, 255, 0.6)": "", position: "relative"}}>
+            <p className="py-2 px-4 ">{waypoint.orderNumber}: lat:{waypoint.latlang.lat} long:{waypoint.latlang.lng}</p>
             {isHovered && <TrashIcon onClick={() => onDeleteClicked(waypoint.id)} className="h-5 w-5 mr-2 mt-2 absolute top-0 right-0" />}
         </div>
     );

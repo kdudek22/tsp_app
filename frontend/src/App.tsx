@@ -83,7 +83,7 @@ const updateDisplayedRoutes = (route: Route) => {
 
         </MapContainer>
       </div>
-      <div className="absolute top-0 left-0 z-50 py-24 ps-3" style={{zIndex: 500}}>
+      <div className="absolute top-0 left-0 z-50 py-24 ms-3" style={{zIndex: 500}}>
         <div>
           <div>
             <Settings/>
@@ -94,7 +94,7 @@ const updateDisplayedRoutes = (route: Route) => {
         </div>
 
       </div>
-      <div className="absolute bottom-0" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
+      <div className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
         <BottomMenu onClick={getDurationMatrix} disableButton={waypoints.length < 2}/>
       </div>
 
@@ -103,9 +103,8 @@ const updateDisplayedRoutes = (route: Route) => {
       {/*<div className='absolute bottom-0 w-screen py-8 flex justify-center'>*/}
       {/*  <button className='bg-green-600 disabled:bg-gray-400 disabled:text-gray-600 py-2 px-6 rounded-xl text-2xl text-white' style={{zIndex: 500}} disabled={waypoints.length < 2} onClick={getDurationMatrix}>Route</button>*/}
       {/*</div>*/}
-      <div className="absolute top-0 right-0 py-8 px-4 flex flex-col" style={{background: "rgba(255, 255, 255, 0.5)", zIndex: 500}}>
-        <h2>Solvers:</h2>
-        {/*<Solver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>*/}
+      <div className="border-black border-2 border-opacity-10 absolute top-0 rounded m-3 right-0 flex flex-col divide-y divide-gray-400" style={{background: "rgba(255, 255, 255, 0.9)", zIndex: 500}}>
+        <h2 className="font-bold text-xl px-4 py-2">Solvers</h2>
         <BasicSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
         <PythonSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
       </div>
