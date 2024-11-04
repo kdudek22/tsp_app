@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Polyline} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import WaypointList from './components/WaypointList';
 import {Route, Waypoint} from './interfaces/Interfaces';
 import {ArrowUturnLeftIcon, Cog6ToothIcon} from "@heroicons/react/24/outline";
@@ -15,6 +15,7 @@ import BasicSolver from "./components/solvers/BasicSolver.tsx";
 import PythonSolver from "./components/solvers/PythonSolver.tsx";
 import Settings from "./components/Settings.tsx";
 import BottomMenu from "./components/BottomMenu.tsx";
+import SolversList from "./components/SolversList.tsx";
 
 
 function App() {
@@ -26,6 +27,19 @@ function App() {
 
   // The calculated cost matrix - after the routing procedure has been started
   const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
+
+  const [waypointMapping, setWaypointMapping] = useState<Map<string, number>>(new Map())
+
+  const [waypointNumber, setWaypointNumber] = useState(0)
+
+  const [defaultWaypointMapping, setDefaultWaypointMapping] = useState<Map<string, number>>(new Map())
+
+  // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
+  useEffect(() => {
+    const defaultMap = new Map(waypoints.map(waypoint => [waypoint.id, waypoint.orderNumber!]))
+    setWaypointMapping(defaultMap)
+    setDefaultWaypointMapping(defaultMap)
+  }, [waypoints]);
 
 
   // This gets the durationMatrix from the api
@@ -57,7 +71,8 @@ const updateDisplayedRoutes = (route: Route) => {
   }
 
   const addWaypoint = (waypoint) => {
-    waypoint = {...waypoint, orderNumber: waypoints.length}
+    waypoint = {...waypoint, orderNumber: waypointNumber}
+    setWaypointNumber(prevState => prevState + 1)
     setWaypoints([...waypoints, waypoint])
   }
 
@@ -70,15 +85,18 @@ const updateDisplayedRoutes = (route: Route) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           <ClickListener onClick={(waypoint) => addWaypoint(waypoint)}/>
+
+          {/* this displays the waypoints, and their numbers */}
           {waypoints.map((waypoint, index) => (
-            <CustomMarker orderNumber={waypoint.orderNumber!} key={index} waypoint={waypoint}/>
+            <CustomMarker orderNumber={waypointMapping.get(waypoint.id)!} key={index} waypoint={waypoint}/>
           ))}
 
-          // this displays the route
+          {/* this displays the route */}
           {displayedRoutes.map((route, index) => (
               <Polyline key={route.id + route.color} positions={route.points} color={route.color}></Polyline>
           ))}
-          // this is the lines between the waypoints
+
+          {/* this is the lines between the waypoints */}
           {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}
 
         </MapContainer>
@@ -97,16 +115,9 @@ const updateDisplayedRoutes = (route: Route) => {
       <div className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
         <BottomMenu onClick={getDurationMatrix} disableButton={waypoints.length < 2}/>
       </div>
-
-
-
-      {/*<div className='absolute bottom-0 w-screen py-8 flex justify-center'>*/}
-      {/*  <button className='bg-green-600 disabled:bg-gray-400 disabled:text-gray-600 py-2 px-6 rounded-xl text-2xl text-white' style={{zIndex: 500}} disabled={waypoints.length < 2} onClick={getDurationMatrix}>Route</button>*/}
-      {/*</div>*/}
-      <div className="border-black border-2 border-opacity-10 absolute top-0 rounded m-3 right-0 flex flex-col divide-y divide-gray-400" style={{background: "rgba(255, 255, 255, 0.9)", zIndex: 500}}>
-        <h2 className="font-bold text-xl px-4 py-2">Solvers</h2>
-        <BasicSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
-        <PythonSolver requestToRemoveFromDisplayedRoutes={removeRouteFromDisplayedRoutes} requestToAddToDisplayedRoutes={updateDisplayedRoutes} waypoints={waypoints} durationMatrix={durationMatrix}/>
+      {/* This is used to render the used solvers */}
+      <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
+        <SolversList waypoints={waypoints} durationMatrix={durationMatrix} removeRouteFromDisplayedRoutes={removeRouteFromDisplayedRoutes} updateDisplayedRoutes={updateDisplayedRoutes}/>
       </div>
     </>
   )

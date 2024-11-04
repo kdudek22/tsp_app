@@ -15,7 +15,7 @@ type MarkerProps = {
       html: `<div id=${waypoint.id}>${orderNumber}</div>`,
       iconSize: [20, 20]
     })
-    return <Marker position={waypoint.latlang} icon={customIcon} id={waypoint.id}></Marker>
+    return <Marker position={waypoint.latlang} icon={customIcon}></Marker>
   }
 
 export default CustomMarker
