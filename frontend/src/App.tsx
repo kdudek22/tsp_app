@@ -4,7 +4,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import {useEffect, useState} from 'react';
 import WaypointList from './components/WaypointList';
 import {Route, Waypoint} from './interfaces/Interfaces';
-import {ArrowUturnLeftIcon, Cog6ToothIcon} from "@heroicons/react/24/outline";
+
 
 import {requestService} from "./services/services.ts";
 import CustomMarker from "./components/CustomMarker.tsx";
@@ -33,6 +33,8 @@ function App() {
   // This holds the number, the last waypoint was assigned,
   const [waypointNumber, setWaypointNumber] = useState(0)
 
+  const [canAddWaypoints, setCanAddWaypoints] = useState<boolean>(true)
+
 
 
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
@@ -51,6 +53,7 @@ function App() {
 
     const data = await response.json()
     setDurationMatrix(JSON.parse(data.response).durations)
+    setCanAddWaypoints(false)
   }
 
   // this is responsible for updating the displayed routes, also used in color changing
@@ -72,6 +75,9 @@ const updateDisplayedRoutes = (route: Route) => {
   }
 
   const addWaypoint = (waypoint) => {
+    if(!canAddWaypoints){
+      return
+    }
     waypoint = {...waypoint, orderNumber: waypointNumber}
     setWaypointNumber(prevState => prevState + 1)
     setWaypoints([...waypoints, waypoint])
@@ -98,7 +104,7 @@ const updateDisplayedRoutes = (route: Route) => {
           ))}
 
           {/* this is the lines between the waypoints */}
-          {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="gray" />}
+          {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="rgb(27, 48, 139)" />}
 
         </MapContainer>
       </div>
@@ -111,7 +117,6 @@ const updateDisplayedRoutes = (route: Route) => {
             <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>
           </div>
         </div>
-
       </div>
       <div className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
         <BottomMenu onClick={getDurationMatrix} disableButton={waypoints.length < 2}/>

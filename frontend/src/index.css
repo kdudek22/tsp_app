@@ -8,13 +8,14 @@
 }
 
 .custom-marker {
-    background-color: rgb(158, 65, 225); /* Change this to any color */
+    background-color: rgb(215,112,204);
+    color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid black;
+    padding: 0.6rem;
 }
 
 .highlighted-marker{
