@@ -12,25 +12,30 @@ type Props = {
     solveTSP: ([[number]]) => Promise<number[]>,
     requestToAddToDisplayedRoutes: (route: Route) => void
     requestToRemoveFromDisplayedRoutes: (id: string) => void
+    onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
+    selectedSolverName: string | null
 }
 
 enum Status{
     idle="Idle", running="Running", finished="Finished"
 }
 
-const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes}: Props) => {
+const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) => {
+
 
     useEffect(() => {
         if (durationMatrix[0].length !== 0) {
             solve()
         }
     }, [durationMatrix]);
+
     const [route, setRoute] = useState<Route>()
     const [isRunning, setIsRunning] = useState(false)
     const [status, setStatus] = useState(Status.idle)
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [isDisplayed, setIsDisplayed] = useState<boolean>(false)
     const [color, setColor] = useState(defaultColor)
+    const [waypointToNumberMapping, setWaypointToNumberMapping] = useState<Map<string, number>>(new Map())
 
     useEffect(() => {
         let timerId;
@@ -70,7 +75,7 @@ const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, reques
         const route: Route = {id: uuidv4(), color: color, solution: solution, totalCost: calculateCost(solution), points: routePoints}
 
         requestToAddToDisplayedRoutes(route)
-        setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setIsRunning(false)
+        setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setIsRunning(false); setWaypointToNumberMapping(createWaypointToNumberMapping(solution))
     }
 
     const toggleDisplayRoute = () => {
@@ -92,9 +97,13 @@ const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, reques
         }
     }
 
+    // This maps the result and the waypoints to a map waypointId => number, that matches the result ordering
+    const createWaypointToNumberMapping = (solution: number[]): Map<String, number> => {
+        return new Map(solution.slice(0, solution.length - 1).map((n, idx) => [waypoints[n].id, idx]))
+    }
 
     return (
-        <div className="flex flex-col text-xs py-3 px-4">
+        <div className={`flex flex-col text-xs py-3 px-4`} style={{background: selectedSolverName === name  && status === Status.finished ? "rgba(102, 204, 255, 0.5)" : ""}} onClick={() => status === Status.finished? onSolverClicked(name, waypointToNumberMapping) : null}>
             <h2 className="font-bold">{name}</h2>
             <div className="flex justify-between gap-3">
                 <div>
@@ -103,7 +112,7 @@ const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, reques
                     <p>Cost: {route == undefined ? "N/A": route.totalCost}</p>
                     <div className="flex items-center">
                         <input disabled={ status!== Status.finished} type="checkbox" onChange={toggleDisplayRoute} checked={isDisplayed}/>
-                        <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{updateRouteColor(e.target.value)}}/>
+                        <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{e.preventDefault(), updateRouteColor(e.target.value)}}/>
                     </div>
                 </div>
                 <div style={{ width: '50px', height: '50px' }}>

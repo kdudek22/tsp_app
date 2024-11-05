@@ -6,13 +6,9 @@ import WaypointList from './components/WaypointList';
 import {Route, Waypoint} from './interfaces/Interfaces';
 import {ArrowUturnLeftIcon, Cog6ToothIcon} from "@heroicons/react/24/outline";
 
-
-import Solver from "./components/solvers/Solver.tsx";
 import {requestService} from "./services/services.ts";
 import CustomMarker from "./components/CustomMarker.tsx";
 import ClickListener from "./components/ClickListener.tsx";
-import BasicSolver from "./components/solvers/BasicSolver.tsx";
-import PythonSolver from "./components/solvers/PythonSolver.tsx";
 import Settings from "./components/Settings.tsx";
 import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
@@ -28,16 +24,21 @@ function App() {
   // The calculated cost matrix - after the routing procedure has been started
   const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
 
-  const [waypointMapping, setWaypointMapping] = useState<Map<string, number>>(new Map())
+  // This maps a given waypoint to a number used for displaying the order of visits on a map
+  const [waypointToNumberMapping, setWaypointToNumberMapping] = useState<Map<string, number>>(new Map())
 
+  // Same as above, but this is used to preserve the default ordering - the input one
+  const [defaultWaypointMapping, setDefaultWaypointMapping] = useState<Map<string, number>>(new Map())
+
+  // This holds the number, the last waypoint was assigned,
   const [waypointNumber, setWaypointNumber] = useState(0)
 
-  const [defaultWaypointMapping, setDefaultWaypointMapping] = useState<Map<string, number>>(new Map())
+
 
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
     const defaultMap = new Map(waypoints.map(waypoint => [waypoint.id, waypoint.orderNumber!]))
-    setWaypointMapping(defaultMap)
+    setWaypointToNumberMapping(defaultMap)
     setDefaultWaypointMapping(defaultMap)
   }, [waypoints]);
 
@@ -88,7 +89,7 @@ const updateDisplayedRoutes = (route: Route) => {
 
           {/* this displays the waypoints, and their numbers */}
           {waypoints.map((waypoint, index) => (
-            <CustomMarker orderNumber={waypointMapping.get(waypoint.id)!} key={index} waypoint={waypoint}/>
+            <CustomMarker orderNumber={waypointToNumberMapping.get(waypoint.id)!} key={index} waypoint={waypoint}/>
           ))}
 
           {/* this displays the route */}
@@ -117,7 +118,7 @@ const updateDisplayedRoutes = (route: Route) => {
       </div>
       {/* This is used to render the used solvers */}
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
-        <SolversList waypoints={waypoints} durationMatrix={durationMatrix} removeRouteFromDisplayedRoutes={removeRouteFromDisplayedRoutes} updateDisplayedRoutes={updateDisplayedRoutes}/>
+        <SolversList setWaypointMapping={setWaypointToNumberMapping} waypoints={waypoints} durationMatrix={durationMatrix} removeRouteFromDisplayedRoutes={removeRouteFromDisplayedRoutes} updateDisplayedRoutes={updateDisplayedRoutes}/>
       </div>
     </>
   )

@@ -6,17 +6,19 @@ type Props = {
     waypoints: Waypoint[],
     requestToAddToDisplayedRoutes: (route: Route) => void
     requestToRemoveFromDisplayedRoutes: (id: string) => void
+    onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
+    selectedSolverName: string | null
 }
 
 
-function BasicSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes}: Props) {
+function BasicSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) {
 
     const solveTSP = ([[number]]): Promise<number[]> => {
         return Promise.resolve([...Array.from({length: durationMatrix.length}, (_, index) => index), 0])
     }
 
     return (
-        <Solver defaultColor={"#000000"} name={"Basic solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints} requestToAddToDisplayedRoutes={requestToAddToDisplayedRoutes} requestToRemoveFromDisplayedRoutes={requestToRemoveFromDisplayedRoutes}></Solver>
+        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Basic solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints} requestToAddToDisplayedRoutes={requestToAddToDisplayedRoutes} requestToRemoveFromDisplayedRoutes={requestToRemoveFromDisplayedRoutes}></Solver>
     );
 }
 
