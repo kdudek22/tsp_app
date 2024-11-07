@@ -12,26 +12,37 @@ import ClickListener from "./components/ClickListener.tsx";
 import Settings from "./components/Settings.tsx";
 import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
+import {useAppStore} from "./store/store.tsx";
 
 
 function App() {
-  // List of waypoints that are visible on the map, Waypoint components use the setter to remove waypoints
-  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
+
+  // List of waypoints that are visible on the map
+  const waypoints = useAppStore((state) => state.waypoints);
+
+  // Setter to remove waypoints
+  const setWaypoints = useAppStore((state) => state.setWaypoints);
+
+  // When you need  to add a waypoint - this has some logic inside
+  const addWaypoint = useAppStore((state) => state.addWaypoint);
 
   // List of routes that are displayed on the map
-  const [displayedRoutes, setDisplayedRoutes] = useState<Route[]>([])
+  const displayedRoutes =  useAppStore((state) => state.displayedRoutes);
+
+  const setDisplayedRoutes = useAppStore((state) => state.setDisplayedRoutes);
+
+  const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
 
   // The calculated cost matrix - after the routing procedure has been started
   const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
 
   // This maps a given waypoint to a number used for displaying the order of visits on a map
-  const [waypointToNumberMapping, setWaypointToNumberMapping] = useState<Map<string, number>>(new Map())
+  const waypointToNumberMapping = useAppStore((state) => state.waypointToVisitOrderNumberMapping)
+
+  const setWaypointToNumberMapping = useAppStore((state) => state.setWaypointToVisitOrderNumberMapping)
 
   // Same as above, but this is used to preserve the default ordering - the input one
   const [defaultWaypointMapping, setDefaultWaypointMapping] = useState<Map<string, number>>(new Map())
-
-  // This holds the number, the last waypoint was assigned,
-  const [waypointNumber, setWaypointNumber] = useState(0)
 
   const [canAddWaypoints, setCanAddWaypoints] = useState<boolean>(true)
 
@@ -57,31 +68,12 @@ function App() {
   }
 
   // this is responsible for updating the displayed routes, also used in color changing
-const updateDisplayedRoutes = (route: Route) => {
-  setDisplayedRoutes(prevDisplayedRoutes => {
-    if (prevDisplayedRoutes.some(r => r.id === route.id)) {
-      return prevDisplayedRoutes.map(r =>
-        r.id === route.id ? { ...r, color: route.color } : r
-      );
-    } else {
-
-      return [...prevDisplayedRoutes, route];
-    }
-  });
-};
-
-  const removeRouteFromDisplayedRoutes = (routeId: string) => {
-    setDisplayedRoutes(displayedRoutes.filter(r => r.id !== routeId))
-  }
-
-  const addWaypoint = (waypoint) => {
-    if(!canAddWaypoints){
-      return
-    }
-    waypoint = {...waypoint, orderNumber: waypointNumber}
-    setWaypointNumber(prevState => prevState + 1)
-    setWaypoints([...waypoints, waypoint])
-  }
+  const updateDisplayedRoutes = (route: Route) => {
+      displayedRoutes.some(r => r.id === route.id) ?
+          setDisplayedRoutes(displayedRoutes.map(r => r.id === route.id ? { ...r, color: route.color } : r))
+          :
+          setDisplayedRoutes([...displayedRoutes, route])
+  };
 
   return (
     <>
@@ -121,9 +113,9 @@ const updateDisplayedRoutes = (route: Route) => {
       <div className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
         <BottomMenu onClick={getDurationMatrix} disableButton={waypoints.length < 2}/>
       </div>
-      {/* This is used to render the used solvers */}
+       {/* This is used to render the used solvers */}
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
-        <SolversList setWaypointMapping={setWaypointToNumberMapping} waypoints={waypoints} durationMatrix={durationMatrix} removeRouteFromDisplayedRoutes={removeRouteFromDisplayedRoutes} updateDisplayedRoutes={updateDisplayedRoutes}/>
+        <SolversList setWaypointMapping={setWaypointToNumberMapping} waypoints={waypoints} durationMatrix={durationMatrix}/>
       </div>
     </>
   )

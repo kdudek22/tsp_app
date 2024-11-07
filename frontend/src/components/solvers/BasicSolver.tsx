@@ -11,14 +11,14 @@ type Props = {
 }
 
 
-function BasicSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) {
+function BasicSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) {
 
     const solveTSP = ([[number]]): Promise<number[]> => {
         return Promise.resolve([...Array.from({length: durationMatrix.length}, (_, index) => index), 0])
     }
 
     return (
-        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Basic solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints} requestToAddToDisplayedRoutes={requestToAddToDisplayedRoutes} requestToRemoveFromDisplayedRoutes={requestToRemoveFromDisplayedRoutes}></Solver>
+        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Basic solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints}></Solver>
     );
 }
 

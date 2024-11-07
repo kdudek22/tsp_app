@@ -22,7 +22,7 @@ function PythonSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes,
     }
 
     return (
-        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#6F6FFF"} name={"Python solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints} requestToAddToDisplayedRoutes={requestToAddToDisplayedRoutes} requestToRemoveFromDisplayedRoutes={requestToRemoveFromDisplayedRoutes}></Solver>
+        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#6F6FFF"} name={"Python solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints}></Solver>
     );
 }
 

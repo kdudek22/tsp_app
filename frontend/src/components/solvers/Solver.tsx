@@ -3,6 +3,7 @@ import {ClipLoader} from "react-spinners";
 import {Route, Waypoint} from "../../interfaces/Interfaces.ts";
 import { v4 as uuidv4 } from 'uuid';
 import {requestService} from "../../services/services.ts";
+import {useAppStore} from "../../store/store.tsx";
 
 type Props = {
     name: string
@@ -10,8 +11,6 @@ type Props = {
     durationMatrix: [[number]],
     waypoints: Waypoint[],
     solveTSP: ([[number]]) => Promise<number[]>,
-    requestToAddToDisplayedRoutes: (route: Route) => void
-    requestToRemoveFromDisplayedRoutes: (id: string) => void
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
 }
@@ -20,8 +19,10 @@ enum Status{
     idle="Idle", running="Running", finished="Finished"
 }
 
-const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) => {
+const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, onSolverClicked, selectedSolverName}: Props) => {
 
+    const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
+    const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
 
     useEffect(() => {
         if (durationMatrix[0].length !== 0) {
@@ -74,15 +75,15 @@ const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, reques
 
         const route: Route = {id: uuidv4(), color: color, solution: solution, totalCost: calculateCost(solution), points: routePoints}
 
-        requestToAddToDisplayedRoutes(route)
+        addRouteToDisplayedRoutes(route)
         setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setIsRunning(false); setWaypointToNumberMapping(createWaypointToNumberMapping(solution))
     }
 
     const toggleDisplayRoute = () => {
         isDisplayed ?
-        (requestToRemoveFromDisplayedRoutes(route!.id), setIsDisplayed(false))
+        (removeRouteFromDisplayed(route!), setIsDisplayed(false))
         :
-        (requestToAddToDisplayedRoutes(route!), setIsDisplayed(true));
+        (addRouteToDisplayedRoutes(route!), setIsDisplayed(true));
     }
 
     const updateRouteColor = (newColor: string) => {
@@ -93,7 +94,7 @@ const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, reques
             const newRoute = {...route}
             newRoute!.color = newColor
             setRoute(newRoute)
-            requestToAddToDisplayedRoutes(newRoute!)
+            addRouteToDisplayedRoutes(newRoute!)
         }
     }
 
