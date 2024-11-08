@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {ClipLoader} from "react-spinners";
-import {Route, Waypoint} from "../../interfaces/Interfaces.ts";
+import {Route} from "../../interfaces/Interfaces.ts";
 import { v4 as uuidv4 } from 'uuid';
 import {requestService} from "../../services/services.ts";
 import {useAppStore} from "../../store/store.tsx";
@@ -9,7 +9,6 @@ type Props = {
     name: string
     defaultColor: string
     durationMatrix: [[number]],
-    waypoints: Waypoint[],
     solveTSP: ([[number]]) => Promise<number[]>,
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
@@ -19,10 +18,11 @@ enum Status{
     idle="Idle", running="Running", finished="Finished"
 }
 
-const Solver = ({name, defaultColor, durationMatrix, waypoints, solveTSP, onSolverClicked, selectedSolverName}: Props) => {
+const Solver = ({name, defaultColor, durationMatrix, solveTSP, onSolverClicked, selectedSolverName}: Props) => {
 
     const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
     const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
+    const waypoints = useAppStore((state) => state.waypoints)
 
     useEffect(() => {
         if (durationMatrix[0].length !== 0) {

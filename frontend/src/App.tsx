@@ -3,8 +3,6 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import {useEffect, useState} from 'react';
 import WaypointList from './components/WaypointList';
-import {Route, Waypoint} from './interfaces/Interfaces';
-
 
 import {requestService} from "./services/services.ts";
 import CustomMarker from "./components/CustomMarker.tsx";
@@ -31,8 +29,6 @@ function App() {
 
   const setDisplayedRoutes = useAppStore((state) => state.setDisplayedRoutes);
 
-  const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
-
   // The calculated cost matrix - after the routing procedure has been started
   const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
 
@@ -44,9 +40,7 @@ function App() {
   // Same as above, but this is used to preserve the default ordering - the input one
   const [defaultWaypointMapping, setDefaultWaypointMapping] = useState<Map<string, number>>(new Map())
 
-  const [canAddWaypoints, setCanAddWaypoints] = useState<boolean>(true)
-
-
+  const setCanAddWaypoints = useAppStore((state) => state.setCanAddWaypoints)
 
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
@@ -66,14 +60,6 @@ function App() {
     setDurationMatrix(JSON.parse(data.response).durations)
     setCanAddWaypoints(false)
   }
-
-  // this is responsible for updating the displayed routes, also used in color changing
-  const updateDisplayedRoutes = (route: Route) => {
-      displayedRoutes.some(r => r.id === route.id) ?
-          setDisplayedRoutes(displayedRoutes.map(r => r.id === route.id ? { ...r, color: route.color } : r))
-          :
-          setDisplayedRoutes([...displayedRoutes, route])
-  };
 
   return (
     <>
@@ -115,7 +101,7 @@ function App() {
       </div>
        {/* This is used to render the used solvers */}
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
-        <SolversList setWaypointMapping={setWaypointToNumberMapping} waypoints={waypoints} durationMatrix={durationMatrix}/>
+        <SolversList setWaypointMapping={setWaypointToNumberMapping} durationMatrix={durationMatrix}/>
       </div>
     </>
   )

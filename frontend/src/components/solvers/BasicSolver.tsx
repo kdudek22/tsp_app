@@ -1,19 +1,15 @@
-import {Route, Waypoint} from "../../interfaces/Interfaces.ts";
 import Solver from "./Solver.tsx";
 
 type Props = {
     durationMatrix: [[number]],
-    waypoints: Waypoint[],
-    requestToAddToDisplayedRoutes: (route: Route) => void
-    requestToRemoveFromDisplayedRoutes: (id: string) => void
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
 }
 
 
-function BasicSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) {
+function BasicSolver({durationMatrix, waypoints, onSolverClicked, selectedSolverName}: Props) {
 
-    const solveTSP = ([[number]]): Promise<number[]> => {
+    const solveTSP = (_: [[number]]): Promise<number[]> => {
         return Promise.resolve([...Array.from({length: durationMatrix.length}, (_, index) => index), 0])
     }
 

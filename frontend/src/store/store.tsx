@@ -15,6 +15,9 @@ type StoreType = {
 
     waypointToVisitOrderNumberMapping: Map<string, number>
     setWaypointToVisitOrderNumberMapping: (mapping: Map<string, number>) => void
+
+    canAddWaypoints: boolean
+    setCanAddWaypoints: (canAdd: boolean) => void
 }
 
 export const useAppStore = create<StoreType> ((set) => ({
@@ -23,11 +26,15 @@ export const useAppStore = create<StoreType> ((set) => ({
     displayedRoutes: [],
     waypointToVisitOrderNumberMapping: new Map(),
 
+    // Add a waypoint, checking the current state of canAddWaypoint
     addWaypoint: (waypoint) => {
-        set((state) => ({
-            waypoints: [...state.waypoints, { ...waypoint, orderNumber: state.waypointNumber }],
-            waypointNumber: state.waypointNumber + 1
-        }))
+        set((state) => {
+            return state.canAddWaypoints ?
+                {waypoints: [...state.waypoints, { ...waypoint, orderNumber: state.waypointNumber }],
+                waypointNumber: state.waypointNumber + 1}
+                :
+                state
+        });
     },
 
     setWaypoints: (waypoints) => {
@@ -54,6 +61,12 @@ export const useAppStore = create<StoreType> ((set) => ({
 
     setWaypointToVisitOrderNumberMapping: (mapping) => {
         set((state) => ({waypointToVisitOrderNumberMapping: mapping}))
+    },
+
+    canAddWaypoints: true,
+
+    setCanAddWaypoints: (canAdd) => {
+        set((state) => ({canAddWaypoints: canAdd}))
     }
 }))
 
