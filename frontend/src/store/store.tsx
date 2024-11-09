@@ -33,7 +33,10 @@ type StoreType = {
     solveForMinimumTime: boolean
     setSolveForMinimumTime: (setVal: boolean) => void
 
-
+    durationMatrix: [[number]]
+    distanceMatrix: [[number]]
+    setDurationMatrix: (newMatrix) => void,
+    setDistanceMatrix: (newMatrix) => void,
 }
 
 
@@ -49,6 +52,9 @@ export const useAppStore = create<StoreType> ((set) => ({
     solveForMinimumTime: true,
     solveForMinimumDistance: false,
 
+    durationMatrix: [[]],
+    distanceMatrix: [[]],
+
     // Add a waypoint, checking the current state of canAddWaypoint
     addWaypoint: (waypoint) => {
         set((state) => {
@@ -61,7 +67,7 @@ export const useAppStore = create<StoreType> ((set) => ({
     },
 
     setWaypoints: (waypoints) => {
-        set(() =>  ({waypoints: waypoints}))
+        set(() =>  ({waypoints: [...waypoints]}))
     },
 
     setDisplayedRoutes: (routes) => {
@@ -105,20 +111,27 @@ export const useAppStore = create<StoreType> ((set) => ({
     },
 
 
-setSolveForMinimumDistance: (setVal) => {
-    set(() => ({
-        solveForMinimumDistance: setVal,
-        solveForMinimumTime: !setVal, // Ensure only one can be true
-    }));
-},
+    setSolveForMinimumDistance: (setVal) => {
+        set(() => ({
+            solveForMinimumDistance: setVal,
+            solveForMinimumTime: !setVal, // Ensure only one can be true
+        }));
+    },
 
-setSolveForMinimumTime: (setVal) => {
-    set(() => ({
-        solveForMinimumTime: setVal,
-        solveForMinimumDistance: !setVal, // Ensure only one can be true
-    }));
-},
+    setSolveForMinimumTime: (setVal) => {
+        set(() => ({
+            solveForMinimumTime: setVal,
+            solveForMinimumDistance: !setVal, // Ensure only one can be true
+        }));
+    },
 
+    setDistanceMatrix: (newMatrix) => {
+        set((state) => ({distanceMatrix: newMatrix}))
+    },
+
+    setDurationMatrix: (newMatrix) => {
+        set((state) => ({durationMatrix: newMatrix}))
+    },
 
 }))
 

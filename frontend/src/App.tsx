@@ -19,21 +19,11 @@ function App() {
   // List of waypoints that are visible on the map
   const waypoints = useAppStore((state) => state.waypoints);
 
-  // Setter to remove waypoints
-  const setWaypoints = useAppStore((state) => state.setWaypoints);
-
   // When you need  to add a waypoint - this has some logic inside
   const addWaypoint = useAppStore((state) => state.addWaypoint);
 
   // List of routes that are displayed on the map
   const displayedRoutes =  useAppStore((state) => state.displayedRoutes);
-
-  const setDisplayedRoutes = useAppStore((state) => state.setDisplayedRoutes);
-
-  // The calculated cost matrix - after the routing procedure has been started
-  const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
-
-  const [distanceMatrix, setDistanceMatrix] = useState<[[number]]>([[]])
 
   // This maps a given waypoint to a number used for displaying the order of visits on a map
   const waypointToNumberMapping = useAppStore((state) => state.waypointToVisitOrderNumberMapping)
@@ -48,6 +38,10 @@ function App() {
   const showLinesBetweenWaypoints = useAppStore((state) => state.showLinesBetweenWaypoints)
 
   const linesBetweenWaypointsColor = useAppStore((state) => state.linesBetweenPointsColor)
+
+  const setDurationMatrix = useAppStore((state) => state.setDurationMatrix)
+
+  const setDistanceMatrix = useAppStore((state) => state.setDistanceMatrix)
 
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
@@ -66,9 +60,8 @@ function App() {
     const data = await response.json()
     const jsonData = JSON.parse(data.response)
 
-
+    setDistanceMatrix(jsonData.distances)
     setDurationMatrix(jsonData.durations)
-    setDi
     setCanAddWaypoints(false)
   }
 
@@ -112,7 +105,7 @@ function App() {
       </div>
        {/* This is used to render the used solvers */}
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
-        <SolversList setWaypointMapping={setWaypointToNumberMapping} durationMatrix={durationMatrix}/>
+        <SolversList setWaypointMapping={setWaypointToNumberMapping}/>
       </div>
       <div className="absolute left-0 bottom-0 ml-4 mb-4" style={{zIndex: "999"}}>
         <Info/>

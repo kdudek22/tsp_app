@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {ClipLoader} from "react-spinners";
-import {Route} from "../../interfaces/Interfaces.ts";
+import {Route, Waypoint} from "../../interfaces/Interfaces.ts";
 import { v4 as uuidv4 } from 'uuid';
 import {requestService} from "../../services/services.ts";
 import {useAppStore} from "../../store/store.tsx";
@@ -18,15 +18,14 @@ enum Status{
     idle="Idle", running="Running", finished="Finished"
 }
 
-const Solver = ({name, defaultColor, durationMatrix, solveTSP, onSolverClicked, selectedSolverName}: Props) => {
+const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverName, durationMatrix}: Props) => {
 
     const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
     const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
-    const waypoints = useAppStore((state) => state.waypoints)
 
     useEffect(() => {
         if (durationMatrix[0].length !== 0) {
-            solve()
+            solve(durationMatrix)
         }
     }, [durationMatrix]);
 
@@ -49,7 +48,7 @@ const Solver = ({name, defaultColor, durationMatrix, solveTSP, onSolverClicked, 
         return () => clearInterval(timerId);
     }, [isRunning]);
 
-    const getRouteFromSolution = async (ordering: number[]) => {
+    const getRouteFromSolution = async (ordering: number[], waypoints: Waypoint[]) => {
         const transformedWaypoints = waypoints.map(waypoint => ({
             id: waypoint.id,
             lat: waypoint.latlang.lat,
@@ -59,24 +58,26 @@ const Solver = ({name, defaultColor, durationMatrix, solveTSP, onSolverClicked, 
         const response = await requestService.post("http://127.0.0.1:8000/api/test", points)
 
         const data = await response.json()
+        console.log(data)
         const geometries: [[number]] = JSON.parse(data.response).features[0].geometry.coordinates
         return geometries
     }
 
-    const calculateCost = (solution) => {
+    const calculateCost = (solution, durationMatrix) => {
         return solution.slice(0, -1).reduce((x, vertex, i) => x + durationMatrix[vertex][solution[i + 1]], 0);
     }
 
-    const solve = async () => {
+    const solve = async (durationMatrix: [[number]]) => {
         setIsRunning(true); setStatus(Status.running)
+        const waypoints = useAppStore.getState().waypoints
 
         const solution = await solveTSP(durationMatrix)
-        let routePoints = (await getRouteFromSolution(solution)).map(x => ({lat: x[1], lng: x[0]}))
+        let routePoints = (await getRouteFromSolution(solution, waypoints)).map(x => ({lat: x[1], lng: x[0]}))
 
-        const route: Route = {id: uuidv4(), color: color, solution: solution, totalCost: calculateCost(solution), points: routePoints}
+        const route: Route = {id: uuidv4(), color: color, solution: solution, totalCost: calculateCost(solution, durationMatrix), points: routePoints}
 
         addRouteToDisplayedRoutes(route)
-        setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setIsRunning(false); setWaypointToNumberMapping(createWaypointToNumberMapping(solution))
+        setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setIsRunning(false); setWaypointToNumberMapping(createWaypointToNumberMapping(solution, waypoints))
     }
 
     const toggleDisplayRoute = () => {
@@ -99,7 +100,7 @@ const Solver = ({name, defaultColor, durationMatrix, solveTSP, onSolverClicked, 
     }
 
     // This maps the result and the waypoints to a map waypointId => number, that matches the result ordering
-    const createWaypointToNumberMapping = (solution: number[]): Map<String, number> => {
+    const createWaypointToNumberMapping = (solution: number[], waypoints: Waypoint[]): Map<String, number> => {
         return new Map(solution.slice(0, solution.length - 1).map((n, idx) => [waypoints[n].id, idx]))
     }
 
