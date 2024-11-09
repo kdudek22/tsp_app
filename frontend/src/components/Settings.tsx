@@ -23,7 +23,7 @@ function Settings() {
     const setSolveForMinimumDistance = useAppStore((state) => state.setSolveForMinimumDistance)
 
     return (
-        <div className="relative rounded w-8 h-8 p-0.5 border-2 border-gray-400" style={{background: "rgba(255, 255, 255, 0.9)", zIndex: 500}}>
+        <div className="relative rounded w-8 h-8 p-0.5 border-2 border-gray-400 flex items-center justify-center" style={{background: "rgba(255, 255, 255, 0.9)", zIndex: 500}}>
             <Cog6ToothIcon className="w-6 h-6 hover:cursor-pointer" onClick={() => setIsOpen(true)}/>
             <Modal isOpen={isOpen} onRequestClose={() => setIsOpen(false)}  style={{overlay: { zIndex: 1000, backgroundColor: "rgba(0, 0, 0, 0.3)" }, content: {width: "fit-content", height: "fit-content",margin: "auto" ,zIndex: 1001}}}>
                 <div className="flex flex-col divide-y divide-blue-600 rounded-lg gap-3">

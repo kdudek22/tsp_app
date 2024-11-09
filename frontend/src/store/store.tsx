@@ -44,7 +44,7 @@ export const useAppStore = create<StoreType> ((set) => ({
     waypointToVisitOrderNumberMapping: new Map(),
     selectedSolverName: null,
     showLinesBetweenWaypoints: true,
-    linesBetweenPointsColor: "rgb(27, 48, 139)",
+    linesBetweenPointsColor: "#000000",
 
     solveForMinimumTime: true,
     solveForMinimumDistance: false,
@@ -101,7 +101,6 @@ export const useAppStore = create<StoreType> ((set) => ({
     },
 
     setLinesBetweenPointsColor: (newColor) => {
-        console.log(newColor)
         set((state) => ({linesBetweenPointsColor: newColor}))
     },
 

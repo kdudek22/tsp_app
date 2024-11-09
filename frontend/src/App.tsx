@@ -11,6 +11,7 @@ import Settings from "./components/Settings.tsx";
 import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
 import {useAppStore} from "./store/store.tsx";
+import Info from "./components/Info.tsx";
 
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
 
   // The calculated cost matrix - after the routing procedure has been started
   const [durationMatrix, setDurationMatrix] = useState<[[number]]>([[]])
+
+  const [distanceMatrix, setDistanceMatrix] = useState<[[number]]>([[]])
 
   // This maps a given waypoint to a number used for displaying the order of visits on a map
   const waypointToNumberMapping = useAppStore((state) => state.waypointToVisitOrderNumberMapping)
@@ -61,7 +64,11 @@ function App() {
     const response = await requestService.post("http://127.0.0.1:8000/api/duration_matrix", transformedWaypoints)
 
     const data = await response.json()
-    setDurationMatrix(JSON.parse(data.response).durations)
+    const jsonData = JSON.parse(data.response)
+
+
+    setDurationMatrix(jsonData.durations)
+    setDi
     setCanAddWaypoints(false)
   }
 
@@ -107,6 +114,10 @@ function App() {
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
         <SolversList setWaypointMapping={setWaypointToNumberMapping} durationMatrix={durationMatrix}/>
       </div>
+      <div className="absolute left-0 bottom-0 ml-4 mb-4" style={{zIndex: "999"}}>
+        <Info/>
+      </div>
+
     </>
   )
 }
