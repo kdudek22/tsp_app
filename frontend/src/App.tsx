@@ -42,6 +42,10 @@ function App() {
 
   const setCanAddWaypoints = useAppStore((state) => state.setCanAddWaypoints)
 
+  const showLinesBetweenWaypoints = useAppStore((state) => state.showLinesBetweenWaypoints)
+
+  const linesBetweenWaypointsColor = useAppStore((state) => state.linesBetweenPointsColor)
+
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
     const defaultMap = new Map(waypoints.map(waypoint => [waypoint.id, waypoint.orderNumber!]))
@@ -82,18 +86,18 @@ function App() {
           ))}
 
           {/* this is the lines between the waypoints */}
-          {waypoints.length >= 2 && <Polyline positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color="rgb(27, 48, 139)" />}
+          {showLinesBetweenWaypoints && waypoints.length >= 2 && <Polyline key={linesBetweenWaypointsColor} positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color={linesBetweenWaypointsColor} />}
 
         </MapContainer>
       </div>
       <div className="absolute top-0 left-0 z-50 py-24 ms-3" style={{zIndex: 500}}>
         <div>
-          <div>
             <Settings/>
           </div>
-          <div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>
-            <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>
-          </div>
+        <div>
+          {/*<div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>*/}
+          {/*  <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>*/}
+          {/*</div>*/}
         </div>
       </div>
       <div className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>

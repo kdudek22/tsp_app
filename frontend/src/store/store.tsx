@@ -18,20 +18,43 @@ type StoreType = {
 
     canAddWaypoints: boolean
     setCanAddWaypoints: (canAdd: boolean) => void
+
+    selectedSolverName: string | null
+    setSelectedSolverName: (name: string) => void
+
+    showLinesBetweenWaypoints: boolean
+    setShowLinesBetweenWaypoints: (next: boolean) => void
+    linesBetweenPointsColor: string
+    setLinesBetweenPointsColor: (newColor: string) => void
+
+    solveForMinimumDistance: boolean
+    setSolveForMinimumDistance: (setVal: boolean) => void
+
+    solveForMinimumTime: boolean
+    setSolveForMinimumTime: (setVal: boolean) => void
+
+
 }
+
 
 export const useAppStore = create<StoreType> ((set) => ({
     waypointNumber: 0,
     waypoints: [],
     displayedRoutes: [],
     waypointToVisitOrderNumberMapping: new Map(),
+    selectedSolverName: null,
+    showLinesBetweenWaypoints: true,
+    linesBetweenPointsColor: "rgb(27, 48, 139)",
+
+    solveForMinimumTime: true,
+    solveForMinimumDistance: false,
 
     // Add a waypoint, checking the current state of canAddWaypoint
     addWaypoint: (waypoint) => {
         set((state) => {
             return state.canAddWaypoints ?
                 {waypoints: [...state.waypoints, { ...waypoint, orderNumber: state.waypointNumber }],
-                waypointNumber: state.waypointNumber + 1}
+                    waypointNumber: state.waypointNumber + 1}
                 :
                 state
         });
@@ -67,8 +90,37 @@ export const useAppStore = create<StoreType> ((set) => ({
 
     setCanAddWaypoints: (canAdd) => {
         set((state) => ({canAddWaypoints: canAdd}))
-    }
-}))
+    },
 
+    setSelectedSolverName: (name) => {
+        set((state) => ({selectedSolverName: name}))
+    },
+
+    setShowLinesBetweenWaypoints: (next) => {
+        set((state) => ({showLinesBetweenWaypoints: next}))
+    },
+
+    setLinesBetweenPointsColor: (newColor) => {
+        console.log(newColor)
+        set((state) => ({linesBetweenPointsColor: newColor}))
+    },
+
+
+setSolveForMinimumDistance: (setVal) => {
+    set(() => ({
+        solveForMinimumDistance: setVal,
+        solveForMinimumTime: !setVal, // Ensure only one can be true
+    }));
+},
+
+setSolveForMinimumTime: (setVal) => {
+    set(() => ({
+        solveForMinimumTime: setVal,
+        solveForMinimumDistance: !setVal, // Ensure only one can be true
+    }));
+},
+
+
+}))
 
 

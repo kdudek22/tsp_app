@@ -1,6 +1,7 @@
 import BasicSolver from "./solvers/BasicSolver.tsx";
 import PythonSolver from "./solvers/PythonSolver.tsx";
 import React, {useState} from "react";
+import {useAppStore} from "../store/store.tsx";
 
 
 type Props = {
@@ -9,8 +10,8 @@ type Props = {
 }
 
 const SolversList = ({durationMatrix, setWaypointMapping}: Props) => {
-
-    const [selectedSolverName, setSelectedSolverName] = useState<string|null>(null)
+    const selectedSolverName = useAppStore((state) => state.selectedSolverName)
+    const setSelectedSolverName = useAppStore((state) => state.setSelectedSolverName)
 
     const updateSelectedSolver = (solverName: string, waypointMapping: Map<string, number>) => {
         setWaypointMapping(waypointMapping)
