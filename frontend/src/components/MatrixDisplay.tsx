@@ -2,7 +2,6 @@ import {useState} from "react";
 import {useAppStore} from "../store/store.tsx";
 
 type Props = {
-    name: string
     passedMatrix: [[number]]
 }
 
@@ -17,11 +16,11 @@ const MatrixElement = ({value, rowIndex, colIndex, valueToColor}: ElementProps) 
     const [isHovered, setIsHovered] = useState<boolean>(false)
     const setMatrixHoveredGridElement = useAppStore((state) => state.setMatrixHoveredGridElement)
     return (
-        <div onMouseEnter={() => {setIsHovered(true); setMatrixHoveredGridElement([rowIndex, colIndex])}} onMouseLeave={() => setIsHovered(false)} key={`${rowIndex}-${colIndex}`} style={{ backgroundColor: valueToColor(value), borderColor: isHovered ? "yellow" : valueToColor(value)}} className="border-2 hover:border-yellow-500 flex-1 flex items-center justify-center min-w-2 min-h-2 text-white">{value}</div>
+        <div onMouseEnter={() => {setIsHovered(true); setMatrixHoveredGridElement([rowIndex, colIndex])}} onMouseLeave={() => setIsHovered(false)} key={`${rowIndex}-${colIndex}`} style={{ backgroundColor: valueToColor(value), borderColor: isHovered ? "yellow" : valueToColor(value)}} className="border-2 hover:border-yellow-500 flex-1 flex items-center justify-center h-16 w-16 text-white">{value}</div>
     )
 }
 
-const MatrixDisplay = ({name, passedMatrix}: Props) => {
+const MatrixDisplay = ({passedMatrix}: Props) => {
 
     const hoveredGridElement = useAppStore((state) => state.matrixHoveredGridElement)
     const setMatrixHoveredGridElement = useAppStore((state) => state.setMatrixHoveredGridElement)

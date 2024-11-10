@@ -11,7 +11,7 @@ import Settings from "./components/Settings.tsx";
 import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
 import {useAppStore} from "./store/store.tsx";
-import Info from "./components/Info.tsx";
+import Matrix from "./components/Matrix.tsx";
 
 
 function App() {
@@ -45,11 +45,15 @@ function App() {
 
   const selectedSolver = useAppStore((state) => state.selectedSolverName)
 
+  const durationMatrix = useAppStore((state) => state.durationMatrix)
+  const distanceMatrix = useAppStore((state) => state.distanceMatrix)
+
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
     const defaultMap = new Map(waypoints.map(waypoint => [waypoint.id, waypoint.orderNumber!]))
     setWaypointToNumberMapping(defaultMap)
     setDefaultWaypointMapping(defaultMap)
+    getDurationMatrix()
   }, [waypoints]);
 
 
@@ -65,7 +69,7 @@ function App() {
 
     setDistanceMatrix(jsonData.distances)
     setDurationMatrix(jsonData.durations)
-    setCanAddWaypoints(false)
+    // setCanAddWaypoints(false)
   }
 
   return (
@@ -110,9 +114,13 @@ function App() {
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
         <SolversList setWaypointMapping={setWaypointToNumberMapping}/>
       </div>
-      <div className="absolute left-0 bottom-0 ml-4 mb-4" style={{zIndex: "999"}}>
-        <Info/>
-      </div>
+        {}
+        {durationMatrix &&
+            <div className="absolute left-0 bottom-0 ml-4 mb-4 flex flex-col gap-3" style={{zIndex: "999"}}>
+                <Matrix name={"Duration Matrix"} matrix={durationMatrix}/>
+                <Matrix name={"Distance Matrix"} matrix={distanceMatrix}/>
+            </div>}
+
 
     </>
   )

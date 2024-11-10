@@ -36,9 +36,11 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     }
 
     useEffect(() => {
-        if (durationMatrix[0].length !== 0) {
-            solve(getMatrixToSolveFor())
-        }
+        console.log("s")
+        // if (durationMatrix[0].length !== 0) {
+        //     let x = 123
+        //     // solve(getMatrixToSolveFor())
+        // }
     }, [durationMatrix]);
 
     const [route, setRoute] = useState<Route>()
