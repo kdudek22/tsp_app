@@ -4,6 +4,8 @@ import {Route, SolveFor, Waypoint} from "../../interfaces/Interfaces.ts";
 import {v4 as uuidv4} from 'uuid';
 import {requestService} from "../../services/services.ts";
 import {useAppStore} from "../../store/store.tsx";
+import {DomUtil} from "leaflet";
+import get = DomUtil.get;
 
 type Props = {
     name: string
@@ -64,11 +66,11 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
             lat: waypoint.latlang.lat,
             lng: waypoint.latlang.lng
         }))
+        const solvingTransportType = useAppStore.getState().solverTransportType
         const points = ordering.map(p => transformedWaypoints[p])
-        const response = await requestService.post("http://127.0.0.1:8000/api/test", points)
+        const response = await requestService.post("http://127.0.0.1:8000/api/route", points)
 
         const data = await response.json()
-        console.log(data)
         const geometries: [[number]] = JSON.parse(data.response).features[0].geometry.coordinates
         return geometries
     }
@@ -81,7 +83,13 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         setIsRunning(true); setStatus(Status.running)
         const waypoints = useAppStore.getState().waypoints
 
-        const solution = await solveTSP(durationMatrix)
+
+        let solution = await solveTSP(durationMatrix)
+
+        if(!useAppStore.getState().returnToStartingPoint){
+            solution = solution.splice(0, solution.length -1)
+        }
+
         let routePoints = (await getRouteFromSolution(solution, waypoints)).map(x => ({lat: x[1], lng: x[0]}))
 
         const route: Route = {id: uuidv4(), color: color, solution: solution, totalCost: calculateCost(solution, durationMatrix), points: routePoints}
@@ -114,6 +122,10 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         return new Map(solution.slice(0, solution.length - 1).map((n, idx) => [waypoints[n].id, idx]))
     }
 
+    const getMetric = () => {
+        return useAppStore.getState().solveFor == SolveFor.duration ? "seconds" : "meters"
+    }
+
     return (
         <div className={`flex flex-col text-xs py-3 px-4`} style={{background: selectedSolverName === name  && status === Status.finished ? "rgba(102, 204, 255, 0.5)" : ""}} onClick={() => status === Status.finished? onSolverClicked(name, waypointToNumberMapping) : null}>
             <h2 className="font-bold">{name}</h2>
@@ -121,7 +133,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
                 <div>
                     <p className="w-32">Status: {status}</p>
                     <p>Time to solve: {timeElapsed !== 0 ? `${Math.floor(timeElapsed/1000)}.${timeElapsed%1000}`: "N/A"}</p>
-                    <p>Cost: {route == undefined ? "N/A": route.totalCost}</p>
+                    <p>Cost: {route == undefined ? "N/A": route.totalCost.toFixed(2) + getMetric()}</p>
                     <div className="flex items-center">
                         <input disabled={ status!== Status.finished} type="checkbox" onChange={toggleDisplayRoute} checked={isDisplayed}/>
                         <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{e.preventDefault(), updateRouteColor(e.target.value)}}/>

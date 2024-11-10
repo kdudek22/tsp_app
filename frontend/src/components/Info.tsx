@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {InformationCircleIcon} from "@heroicons/react/24/outline";
+import {CubeTransparentIcon} from "@heroicons/react/24/outline";
 import MatrixDisplay from "./MatrixDisplay.tsx";
 import Modal from "react-modal";
 import {useAppStore} from "../store/store.tsx";
@@ -15,7 +15,7 @@ const Info = () => {
 
     return (
         <div className="relative rounded w-8 h-8 p-0.5 border-2 border-gray-400" style={{background: "rgba(255, 255, 255, 0.9)", zIndex: 500}} onClick={() => setIsOpen2(!isOpen2)}>
-            <InformationCircleIcon className="h-6 w-6"/>
+            <CubeTransparentIcon title="Matrixes" className="h-6 w-6"/>
             {isOpen2 &&
                 <div className="absolute -top-24 left-8 p-2 rounded w-36 border-2 border-gray-400" style={{background: "rgba(255, 255, 255, 0.9)"}}>
                     <div>

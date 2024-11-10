@@ -10,7 +10,6 @@ type Props = {
 function BasicSolver({waypoints, onSolverClicked, selectedSolverName, durationMatrix}: Props) {
 
     const solveTSP = (durationMatrix: [[number]]): Promise<number[]> => {
-        console.log(durationMatrix)
         return Promise.resolve([...Array.from({length: durationMatrix.length}, (_, index) => index), 0])
     }
 

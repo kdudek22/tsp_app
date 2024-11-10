@@ -3,7 +3,9 @@ import {Cog6ToothIcon} from "@heroicons/react/24/outline";
 import Modal from 'react-modal';
 import "react-toggle/style.css"
 import {useAppStore} from "../store/store.tsx";
-import {SolveFor} from "../interfaces/Interfaces.ts";
+import {SolveFor, SolveTransportType} from "../interfaces/Interfaces.ts";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import PedestrianIcon from "@mui/icons-material/DirectionsWalk";
 
 Modal.setAppElement("#root");
 
@@ -17,16 +19,35 @@ function Settings() {
     const setSolveFor = useAppStore((state) => state.setSolveFor)
     const weightedSolveWeight = useAppStore((state) => state.weightedSolveWeight)
     const setWeightedSolverWeight = useAppStore((state) => state.setWeightedSolverWeight)
+    const returnToStartingPoint = useAppStore((state) => state.returnToStartingPoint)
+    const setReturnToStartingPoint = useAppStore((state) => state.setReturnToStartingPoint)
+    const solverTransportType = useAppStore((state) => state.solverTransportType)
+    const setSolverTransportType = useAppStore((state) => state.setSolverTransportType)
+
 
     return (
         <div className="relative rounded w-8 h-8 p-0.5 border-2 border-gray-400 flex items-center justify-center" style={{background: "rgba(255, 255, 255, 0.9)", zIndex: 500}}>
             <Cog6ToothIcon className="w-6 h-6 hover:cursor-pointer" onClick={() => setIsOpen(true)}/>
-            <Modal isOpen={isOpen} onRequestClose={() => setIsOpen(false)}  style={{overlay: { zIndex: 1000, backgroundColor: "rgba(0, 0, 0, 0.3)" }, content: {width: "fit-content", height: "fit-content",margin: "auto" ,zIndex: 1001}}}>
-                <div className="flex flex-col gap-3">
-                    <p className="text-xl font-bold mb-2">Settings</p>
-                    <div className="border-2 border-blue-400 p-2 rounded-xl">
-                        <p className="mb-2">UI:</p>
-                        <div className="flex flex-col">
+            <Modal isOpen={isOpen} onRequestClose={() => setIsOpen(false)}  style={{overlay: { zIndex: 1000, backgroundColor: "rgba(0, 0, 0, 0.3)" }, content: {width: "fit-content", height: "fit-content",margin: "auto" ,zIndex: 1001, backgroundColor: "white", borderRadius: "0.75rem"}}}>
+                <div className="flex flex-col text-gray-700">
+                    <p className="mb-2 text-xl font-bold">General:</p>
+                    <div className="shadow p-2 rounded-xl bg-gray-100 border-2 border-gray-400">
+                        <div className="flex flex-col divide-y divide-gray-400 ">
+                            <div className="flex items-center gap-32 justify-between">
+                                <p>Route for</p>
+                                <div className="flex">
+                                    <input type="checkbox" checked={solverTransportType === SolveTransportType.car} onChange={() => setSolverTransportType(SolveTransportType.car)}/>
+                                    <DirectionsCarIcon style={{ fontSize: 30, color: "black" }} />
+                                    <input type="checkbox" checked={solverTransportType === SolveTransportType.walking} onChange={() => setSolverTransportType(SolveTransportType.walking)}/>
+                                    <PedestrianIcon style={{ fontSize: 30, color: "black" }} />
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <p className="mb-2 text-xl font-bold">UI:</p>
+                    <div className="shadow p-2 rounded-xl bg-gray-100 border-2 border-gray-400">
+                        <div className="flex flex-col divide-y divide-gray-400 ">
                             <div className="flex items-center gap-32 justify-between">
                                 <p>Show lines between points</p>
                                 <input type="checkbox" defaultChecked={showLinesBetweenPoints} onChange={() => setShowLinesBetweenPoints(!showLinesBetweenPoints)}/>
@@ -37,9 +58,13 @@ function Settings() {
                             </div>
                         </div>
                     </div>
-                    <div className="border-2 border-pink-600 rounded-xl p-2">
-                        <p className="mb-2">Solver:</p>
-                        <div className="flex flex-col">
+                    <p className="mb-2 text-xl font-bold">Solver:</p>
+                    <div className="bg-gray-100 rounded-xl p-2 shadow border-2 border-gray-400">
+                        <div className="flex flex-col divide-y divide-gray-400">
+                            <div className="flex items-center gap-32 justify-between">
+                                <p>Return to starting point</p>
+                                <input type="checkbox" checked={returnToStartingPoint} onChange={(e) => setReturnToStartingPoint(!returnToStartingPoint)}/>
+                            </div>
                             <div className="flex items-center gap-32 justify-between">
                                 <p>Solve for minimum travel duration</p>
                                 <input type="checkbox" checked={solveFor === SolveFor.duration} onChange={(e) => setSolveFor(SolveFor.duration)}/>
@@ -73,9 +98,11 @@ function Settings() {
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
+
             </Modal>
         </div>
     );

@@ -1,6 +1,5 @@
 import {create} from 'zustand'
-import {Route, Waypoint, SolveFor} from "../interfaces/Interfaces.ts";
-
+import {Route, SolveFor, SolveTransportType, Waypoint} from "../interfaces/Interfaces.ts";
 
 
 type StoreType = {
@@ -42,6 +41,12 @@ type StoreType = {
     weightedSolveWeight: number
     setWeightedSolverWeight: (weight: number) => void
 
+    returnToStartingPoint: boolean
+    setReturnToStartingPoint: (newState: boolean) => void
+
+    solverTransportType: SolveTransportType
+    setSolverTransportType: (type: SolveTransportType) => void
+
 }
 
 
@@ -61,6 +66,9 @@ export const useAppStore = create<StoreType> ((set) => ({
     solveFor: SolveFor.duration,
 
     weightedSolveWeight: 50,
+
+    returnToStartingPoint: true,
+    solverTransportType: SolveTransportType.car,
 
 
     setWeightedSolverWeight: (weight) => {
@@ -139,6 +147,14 @@ export const useAppStore = create<StoreType> ((set) => ({
     setMatrixHoveredGridElement: (element) => {
         set((state) => ({matrixHoveredGridElement: element}))
     },
+
+    setReturnToStartingPoint: (newState) => {
+        set((state) => ({returnToStartingPoint: newState}))
+    },
+
+    setSolverTransportType: (newType) => {
+        set((state) => ({solverTransportType: newType}))
+    }
 
 }))
 

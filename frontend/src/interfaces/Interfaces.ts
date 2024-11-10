@@ -19,3 +19,6 @@ export enum SolveFor{
     distance="distance", duration="duration", weighted="weighted"
 }
 
+export enum SolveTransportType{
+    car="car", walking="walking"
+}

@@ -57,6 +57,7 @@ function App() {
   const getDurationMatrix = async () => {
     const transformedWaypoints = waypoints.map(waypoint => ({id: waypoint.id, lat: waypoint.latlang.lat, lng: waypoint.latlang.lng}))
 
+    const transportType = useAppStore.getState().solverTransportType
     const response = await requestService.post("http://127.0.0.1:8000/api/duration_matrix", transformedWaypoints)
 
     const data = await response.json()
@@ -70,7 +71,7 @@ function App() {
   return (
     <>
       <div className='w-screen h-screen flex justify-center relative'>
-        <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: '100vh', width: '100vw'}}>
+        <MapContainer center={[50.065262, 19.919038]} zoom={13} style={{ height: '100vh', width: '100vw'}}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

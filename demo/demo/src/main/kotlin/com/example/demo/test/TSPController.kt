@@ -50,7 +50,7 @@ class TSPController {
         return mapOf("response" to responseString)
     }
 
-    @PostMapping("/test")
+    @PostMapping("/route")
     fun testResponse(@RequestBody waypoints: List<Waypoint>): Map<String, Any> {
         val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
 
