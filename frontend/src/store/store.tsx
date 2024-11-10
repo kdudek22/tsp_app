@@ -1,5 +1,7 @@
 import {create} from 'zustand'
-import {Route, Waypoint} from "../interfaces/Interfaces.ts";
+import {Route, Waypoint, SolveFor} from "../interfaces/Interfaces.ts";
+
+
 
 type StoreType = {
     waypointNumber: number
@@ -27,16 +29,19 @@ type StoreType = {
     linesBetweenPointsColor: string
     setLinesBetweenPointsColor: (newColor: string) => void
 
-    solveForMinimumDistance: boolean
-    setSolveForMinimumDistance: (setVal: boolean) => void
-
-    solveForMinimumTime: boolean
-    setSolveForMinimumTime: (setVal: boolean) => void
-
     durationMatrix: [[number]]
     distanceMatrix: [[number]]
     setDurationMatrix: (newMatrix) => void,
     setDistanceMatrix: (newMatrix) => void,
+
+    matrixHoveredGridElement: [number | null, number : null]
+    setMatrixHoveredGridElement: (element: [number | null, number | null]) => void
+
+    solveFor: SolveFor
+    setSolveFor: (solveFor: SolveFor) => void
+    weightedSolveWeight: number
+    setWeightedSolverWeight: (weight: number) => void
+
 }
 
 
@@ -49,11 +54,24 @@ export const useAppStore = create<StoreType> ((set) => ({
     showLinesBetweenWaypoints: true,
     linesBetweenPointsColor: "#000000",
 
-    solveForMinimumTime: true,
-    solveForMinimumDistance: false,
-
     durationMatrix: [[]],
     distanceMatrix: [[]],
+
+    matrixHoveredGridElement: [null, null],
+    solveFor: SolveFor.duration,
+
+    weightedSolveWeight: 50,
+
+
+    setWeightedSolverWeight: (weight) => {
+        set((state) => ({weightedSolveWeight: weight}))
+    },
+
+    setSolveFor: (solveFor) => {
+        set((state) => ({solveFor: solveFor}))
+    },
+
+
 
     // Add a waypoint, checking the current state of canAddWaypoint
     addWaypoint: (waypoint) => {
@@ -110,27 +128,16 @@ export const useAppStore = create<StoreType> ((set) => ({
         set((state) => ({linesBetweenPointsColor: newColor}))
     },
 
-
-    setSolveForMinimumDistance: (setVal) => {
-        set(() => ({
-            solveForMinimumDistance: setVal,
-            solveForMinimumTime: !setVal, // Ensure only one can be true
-        }));
-    },
-
-    setSolveForMinimumTime: (setVal) => {
-        set(() => ({
-            solveForMinimumTime: setVal,
-            solveForMinimumDistance: !setVal, // Ensure only one can be true
-        }));
-    },
-
     setDistanceMatrix: (newMatrix) => {
         set((state) => ({distanceMatrix: newMatrix}))
     },
 
     setDurationMatrix: (newMatrix) => {
         set((state) => ({durationMatrix: newMatrix}))
+    },
+
+    setMatrixHoveredGridElement: (element) => {
+        set((state) => ({matrixHoveredGridElement: element}))
     },
 
 }))

@@ -43,6 +43,8 @@ function App() {
 
   const setDistanceMatrix = useAppStore((state) => state.setDistanceMatrix)
 
+  const selectedSolver = useAppStore((state) => state.selectedSolverName)
+
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
     const defaultMap = new Map(waypoints.map(waypoint => [waypoint.id, waypoint.orderNumber!]))
@@ -77,7 +79,7 @@ function App() {
 
           {/* this displays the waypoints, and their numbers */}
           {waypoints.map((waypoint, index) => (
-            <CustomMarker orderNumber={waypointToNumberMapping.get(waypoint.id)!} key={index} waypoint={waypoint}/>
+            <CustomMarker orderNumber={waypointToNumberMapping.get(waypoint.id)!} color={"white"} key={index} waypoint={waypoint}/>
           ))}
 
           {/* this displays the route */}

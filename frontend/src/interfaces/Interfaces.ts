@@ -13,3 +13,9 @@ export interface Route {
     solution: number[]
     points: L.LatLng[]
 }
+
+
+export enum SolveFor{
+    distance="distance", duration="duration", weighted="weighted"
+}
+

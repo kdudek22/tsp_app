@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {ClipLoader} from "react-spinners";
-import {Route, Waypoint} from "../../interfaces/Interfaces.ts";
-import { v4 as uuidv4 } from 'uuid';
+import {Route, SolveFor, Waypoint} from "../../interfaces/Interfaces.ts";
+import {v4 as uuidv4} from 'uuid';
 import {requestService} from "../../services/services.ts";
 import {useAppStore} from "../../store/store.tsx";
 
@@ -23,9 +23,19 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
     const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
 
+    const getMatrixToSolveFor = () => {
+        if(useAppStore.getState().solveFor === SolveFor.distance){
+                return useAppStore.getState().distanceMatrix
+        }
+        else if(useAppStore.getState().solveFor === SolveFor.duration){
+            return useAppStore.getState().durationMatrix
+        }
+        return useAppStore.getState().durationMatrix
+    }
+
     useEffect(() => {
         if (durationMatrix[0].length !== 0) {
-            solve(durationMatrix)
+            solve(getMatrixToSolveFor())
         }
     }, [durationMatrix]);
 

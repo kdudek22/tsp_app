@@ -8,10 +8,10 @@ type MarkerProps = {
     orderNumber: number
   }
 
-  const CustomMarker = ({waypoint, orderNumber}: MarkerProps) => {
+  const CustomMarker = ({waypoint, orderNumber, color}: MarkerProps) => {
     const customIcon = L.divIcon({
       className: `${waypoint.id} custom-marker`,
-      html: `<div id=${waypoint.id}>${orderNumber}</div>`,
+      html: `<div id=${waypoint.id} style="color: ${color}">${orderNumber}</div>`,
       iconSize: [20, 20]
     })
     return <Marker position={waypoint.latlang} icon={customIcon}></Marker>
