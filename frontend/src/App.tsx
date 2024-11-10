@@ -12,6 +12,7 @@ import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
 import {useAppStore} from "./store/store.tsx";
 import Matrix from "./components/Matrix.tsx";
+import { gsap } from 'gsap';
 
 
 function App() {
@@ -33,20 +34,30 @@ function App() {
   // Same as above, but this is used to preserve the default ordering - the input one
   const [defaultWaypointMapping, setDefaultWaypointMapping] = useState<Map<string, number>>(new Map())
 
-  const setCanAddWaypoints = useAppStore((state) => state.setCanAddWaypoints)
+  // List of waypoints that are displayed on the map
+  const setWaypoints = useAppStore((state) => state.setWaypoints)
 
+  // This determines wether lines between points are shown
   const showLinesBetweenWaypoints = useAppStore((state) => state.showLinesBetweenWaypoints)
 
+  // Sets the color for lines between waypoints
   const linesBetweenWaypointsColor = useAppStore((state) => state.linesBetweenPointsColor)
 
   const setDurationMatrix = useAppStore((state) => state.setDurationMatrix)
 
   const setDistanceMatrix = useAppStore((state) => state.setDistanceMatrix)
 
-  const selectedSolver = useAppStore((state) => state.selectedSolverName)
-
   const durationMatrix = useAppStore((state) => state.durationMatrix)
   const distanceMatrix = useAppStore((state) => state.distanceMatrix)
+
+  const setStartSolving = useAppStore((state) => state.setStartSolving)
+
+  const solverTransportType = useAppStore((state) => state.solverTransportType)
+
+    useEffect(() => {
+        getDurationMatrix()
+    }, [solverTransportType]);
+
 
   // this useEffect updates the waypoint numbers displayed on the map, when a user chooses a route, its ordering is displayed
   useEffect(() => {
@@ -61,15 +72,15 @@ function App() {
   const getDurationMatrix = async () => {
     const transformedWaypoints = waypoints.map(waypoint => ({id: waypoint.id, lat: waypoint.latlang.lat, lng: waypoint.latlang.lng}))
 
-    const transportType = useAppStore.getState().solverTransportType
-    const response = await requestService.post("http://127.0.0.1:8000/api/duration_matrix", transformedWaypoints)
+    const transportType = useAppStore.getState().solverTransportType.toString()
+
+    const response = await requestService.post(`http://127.0.0.1:8000/api/duration_matrix?transport_type=${transportType}`, transformedWaypoints)
 
     const data = await response.json()
     const jsonData = JSON.parse(data.response)
 
     setDistanceMatrix(jsonData.distances)
     setDurationMatrix(jsonData.durations)
-    // setCanAddWaypoints(false)
   }
 
   return (
@@ -102,14 +113,16 @@ function App() {
             <Settings/>
           </div>
         <div>
-          {/*<div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>*/}
-          {/*  <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>*/}
-          {/*</div>*/}
+          <div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>
+            <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>
+          </div>
         </div>
       </div>
-      <div className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
-        <BottomMenu onClick={getDurationMatrix} disableButton={waypoints.length < 2}/>
-      </div>
+      {waypoints.length > 1 &&
+          <div id="#bottom-menu" className="absolute bottom-0 mb-2" style={{left: "50%", zIndex: 999, transform: "translateX(-50%)"}}>
+            <BottomMenu onClick={() => setStartSolving(true)} disableButton={waypoints.length < 2}/>
+          </div>}
+
        {/* This is used to render the used solvers */}
       <div className="absolute top-0 right-0" style={{zIndex: "999"}}>
         <SolversList setWaypointMapping={setWaypointToNumberMapping}/>
@@ -120,8 +133,6 @@ function App() {
                 <Matrix name={"Duration Matrix"} matrix={durationMatrix}/>
                 <Matrix name={"Distance Matrix"} matrix={distanceMatrix}/>
             </div>}
-
-
     </>
   )
 }

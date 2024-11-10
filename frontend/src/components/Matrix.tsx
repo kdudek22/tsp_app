@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import MatrixDisplay from "./MatrixDisplay.tsx";
 import Modal from "react-modal";
-import { useAppStore } from "../store/store.tsx";
-
 import matrixImage from "../static/matrix.png";
 
 Modal.setAppElement("#root");
@@ -13,8 +11,6 @@ type Props = {
 }
 
 const Matrix = ({name, matrix}: Props) => {
-    const durationMatrix = useAppStore((state) => state.durationMatrix);
-
     const [isHovered, setIsHovered] = useState(false);
 
     return (

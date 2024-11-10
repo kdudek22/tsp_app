@@ -27,26 +27,22 @@ const MatrixDisplay = ({passedMatrix}: Props) => {
 
     function valueToColor(value) {
         const {min, max} = getMaxMin(passedMatrix)
-        // const maxValue = 10000
-        // Clamp value between minValue and maxValue
+
         value = Math.min(Math.max(value, min), max);
 
-        // Normalize the value between 0 and 1
         const normalizedValue = (value - min) / (max - min);
 
-        // Calculate red and blue components
-        const red = Math.round(normalizedValue * 255); // Red increases as value increases
-        const blue = Math.round((1 - normalizedValue) * 255); // Blue decreases as value increases
+        const red = Math.round(normalizedValue * 255);
+        const blue = Math.round((1 - normalizedValue) * 255);
 
-        // Return color in RGB format
         return `rgb(${red}, 0, ${blue})`;
     }
 
     function getMaxMin(matrix: number[][]): { max: number, min: number } {
-        const allValues = matrix.flat(); // Flatten the matrix into a single array
+        const allValues = matrix.flat();
         return {
-            max: Math.max(...allValues), // Get the maximum value
-            min: Math.min(...allValues), // Get the minimum value
+            max: Math.max(...allValues),
+            min: Math.min(...allValues),
         };
     }
 

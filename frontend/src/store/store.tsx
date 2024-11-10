@@ -47,6 +47,9 @@ type StoreType = {
     solverTransportType: SolveTransportType
     setSolverTransportType: (type: SolveTransportType) => void
 
+    startSolving: boolean
+    setStartSolving: (newState: boolean) => void
+
 }
 
 
@@ -69,6 +72,12 @@ export const useAppStore = create<StoreType> ((set) => ({
 
     returnToStartingPoint: true,
     solverTransportType: SolveTransportType.car,
+
+    startSolving: false,
+
+    setStartSolving: (newState) => {
+        set((state) => ({startSolving: newState}))
+    },
 
 
     setWeightedSolverWeight: (weight) => {

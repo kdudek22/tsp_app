@@ -20,5 +20,11 @@ export enum SolveFor{
 }
 
 export enum SolveTransportType{
-    car="car", walking="walking"
+    car="driving-car", walking="foot-walking"
+}
+
+export interface Matrix{
+    durationMatrix: [[number]]
+    distanceMatrix: [[number]]
+    weightedMatrix: [[number]]
 }

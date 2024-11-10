@@ -4,8 +4,6 @@ import {Route, SolveFor, Waypoint} from "../../interfaces/Interfaces.ts";
 import {v4 as uuidv4} from 'uuid';
 import {requestService} from "../../services/services.ts";
 import {useAppStore} from "../../store/store.tsx";
-import {DomUtil} from "leaflet";
-import get = DomUtil.get;
 
 type Props = {
     name: string
@@ -24,6 +22,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
 
     const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
     const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
+    const startSolving = useAppStore((state) => state.startSolving)
 
     const getMatrixToSolveFor = () => {
         if(useAppStore.getState().solveFor === SolveFor.distance){
@@ -36,12 +35,10 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     }
 
     useEffect(() => {
-        console.log("s")
-        // if (durationMatrix[0].length !== 0) {
-        //     let x = 123
-        //     // solve(getMatrixToSolveFor())
-        // }
-    }, [durationMatrix]);
+        if (startSolving) {
+            solve(getMatrixToSolveFor())
+        }
+    }, [startSolving]);
 
     const [route, setRoute] = useState<Route>()
     const [isRunning, setIsRunning] = useState(false)
@@ -68,9 +65,9 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
             lat: waypoint.latlang.lat,
             lng: waypoint.latlang.lng
         }))
-        const solvingTransportType = useAppStore.getState().solverTransportType
         const points = ordering.map(p => transformedWaypoints[p])
-        const response = await requestService.post("http://127.0.0.1:8000/api/route", points)
+        const transportType = useAppStore.getState().solverTransportType.toString()
+        const response = await requestService.post(`http://127.0.0.1:8000/api/route?transport_type=${transportType}`, points)
 
         const data = await response.json()
         const geometries: [[number]] = JSON.parse(data.response).features[0].geometry.coordinates
@@ -85,10 +82,10 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         setIsRunning(true); setStatus(Status.running)
         const waypoints = useAppStore.getState().waypoints
 
-
         let solution = await solveTSP(durationMatrix)
 
         if(!useAppStore.getState().returnToStartingPoint){
+            // In case we do not return to the starting position
             solution = solution.splice(0, solution.length -1)
         }
 
