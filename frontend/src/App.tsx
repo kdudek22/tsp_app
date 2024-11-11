@@ -12,7 +12,6 @@ import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
 import {useAppStore} from "./store/store.tsx";
 import Matrix from "./components/Matrix.tsx";
-import { gsap } from 'gsap';
 
 
 function App() {

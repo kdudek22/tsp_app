@@ -1,6 +1,8 @@
 import {Waypoint} from "../interfaces/Interfaces.ts";
 import L from "leaflet";
-import {Marker, Tooltip} from "react-leaflet";
+import {Marker, Popup} from "react-leaflet";
+
+
 
 
 type MarkerProps = {
@@ -14,10 +16,13 @@ type MarkerProps = {
       html: `<div id=${waypoint.id} style="color: ${color}">${orderNumber}</div>`,
       iconSize: [20, 20]
     })
-    return <Marker position={waypoint.latlang} icon={customIcon}>
-      <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-
-      </Tooltip>
+    return <Marker position={waypoint.latlang} icon={customIcon} >
+      <Popup interactive={true}>
+        <div className="flex flex-col">
+          <p className="m-0 p-0">Lat: {waypoint.latlang.lat}</p>
+          <p>Lng: {waypoint.latlang.lng}</p>
+        </div>
+      </Popup>
     </Marker>
   }
 

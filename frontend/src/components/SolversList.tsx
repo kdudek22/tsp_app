@@ -2,6 +2,7 @@ import BasicSolver from "./solvers/BasicSolver.tsx";
 import PythonSolver from "./solvers/PythonSolver.tsx";
 import React from "react";
 import {useAppStore} from "../store/store.tsx";
+import MiniZincSolver from "./solvers/MiniZincSolver.tsx";
 
 
 type Props = {
@@ -19,7 +20,8 @@ const SolversList = ({setWaypointMapping}: Props) => {
     }
 
     const solvers = [<BasicSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
-                               <PythonSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>]
+                               <PythonSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
+                               <MiniZincSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>]
 
     return (
         <div className="border-gray-400 border-2 rounded m-3 flex flex-col divide-y divide-gray-400" style={{background: "rgba(255, 255, 255, 0.9)"}}>

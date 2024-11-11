@@ -44,7 +44,7 @@ class MinizincSolver(AbstractSolver):
 
         instance = Instance(Solver.lookup("chuffed"), model)
 
-        instance["n"] = 2
+        instance["n"] = len(matrix)
         instance["distance"] = matrix
 
         result = instance.solve()
@@ -73,4 +73,8 @@ if __name__ == "__main__":
     [| 1, 2, 3
      | 4, 5, 6
      | 5, 6, 7 |]
+     
+     [| 0, 650, 1035
+      | 666, 0, 782
+      | 1053, 875, 0 |]
 """
