@@ -98,11 +98,9 @@ function Settings() {
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
-
             </Modal>
         </div>
     );
