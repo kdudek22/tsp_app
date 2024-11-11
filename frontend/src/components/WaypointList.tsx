@@ -14,6 +14,7 @@ function WaypointList({waypoints, updateWaypoints}: Props) {
 
     return (
         <>
+            <h1 className="p-2 font-bold">Waypoints:</h1>
             {waypoints.map((waypoint, index) => (
                 <WaypointElement waypoint={waypoint} key={index} onDeleteClicked={onWaypointDelete}></WaypointElement>
             ))}

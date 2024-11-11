@@ -1,24 +1,20 @@
-import {Route, Waypoint} from "../../interfaces/Interfaces.ts";
 import Solver from "./Solver.tsx";
 
 type Props = {
-    durationMatrix: [[number]],
-    waypoints: Waypoint[],
-    requestToAddToDisplayedRoutes: (route: Route) => void
-    requestToRemoveFromDisplayedRoutes: (id: string) => void
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
+    durationMatrix: [[number]],
 }
 
 
-function BasicSolver({durationMatrix, waypoints, requestToAddToDisplayedRoutes, requestToRemoveFromDisplayedRoutes, onSolverClicked, selectedSolverName}: Props) {
+function BasicSolver({waypoints, onSolverClicked, selectedSolverName, durationMatrix}: Props) {
 
-    const solveTSP = ([[number]]): Promise<number[]> => {
+    const solveTSP = (durationMatrix: [[number]]): Promise<number[]> => {
         return Promise.resolve([...Array.from({length: durationMatrix.length}, (_, index) => index), 0])
     }
 
     return (
-        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Basic solver"} durationMatrix={durationMatrix} solveTSP={solveTSP} waypoints={waypoints} requestToAddToDisplayedRoutes={requestToAddToDisplayedRoutes} requestToRemoveFromDisplayedRoutes={requestToRemoveFromDisplayedRoutes}></Solver>
+        <Solver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Basic solver"} solveTSP={solveTSP} waypoints={waypoints}></Solver>
     );
 }
 

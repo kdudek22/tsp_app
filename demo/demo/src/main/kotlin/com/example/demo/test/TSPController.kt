@@ -20,6 +20,8 @@ fun sendPostRequest(url: String, body: String): Response{
     val client = OkHttpClient()
     val requestBody = body.toRequestBody()
 
+    println(requestBody)
+
     val request = Request.Builder()
         .url(url)
         .post(requestBody)
@@ -36,27 +38,23 @@ fun sendPostRequest(url: String, body: String): Response{
 class TSPController {
 
     @PostMapping("/duration_matrix")
-    fun getDurationMatrix(@RequestBody waypoints: List<Waypoint>): Map<String, Any> {
+    fun getDurationMatrix(@RequestParam(name="transport_type", defaultValue="driving-car") transportType: String, @RequestBody waypoints: List<Waypoint>): Map<String, Any> {
         val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
 
-        val response = sendPostRequest("https://api.openrouteservice.org/v2/matrix/driving-car",
-            jacksonObjectMapper().writeValueAsString(mapOf("locations" to transformedWaypoints)))
+        val response = sendPostRequest("https://api.openrouteservice.org/v2/matrix/${transportType}",
+            jacksonObjectMapper().writeValueAsString(mapOf("locations" to transformedWaypoints, "metrics" to arrayOf("distance", "duration"))))
 
         val responseString = response.body?.string() ?: "No response body"
 
+        println(responseString)
         return mapOf("response" to responseString)
     }
 
-    @PostMapping("/test")
-    fun testResponse(@RequestBody waypoints: List<Waypoint>): Map<String, Any> {
+    @PostMapping("/route")
+    fun getRoute(@RequestParam(name="transport_type", defaultValue="driving-car") transportType: String, @RequestBody waypoints: List<Waypoint>): Map<String, Any> {
         val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
 
-//        val response = sendPostRequest("https://api.openrouteservice.org/v2/matrix/driving-car",
-//            jacksonObjectMapper().writeValueAsString(mapOf("locations" to transformedWaypoints)))
-//
-//        val responseString = response.body?.string() ?: "No response body"
-
-        val response = sendPostRequest("https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+        val response = sendPostRequest("https://api.openrouteservice.org/v2/directions/${transportType}/geojson",
             jacksonObjectMapper().writeValueAsString(mapOf("coordinates" to transformedWaypoints + arrayOf(transformedWaypoints.first()), "radiuses" to arrayOf(-1))))
 
 

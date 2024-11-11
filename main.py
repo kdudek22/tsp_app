@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import lru_cache
-
+from Solvers import MinizincSolver
 
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +34,7 @@ def traveling_salesman_solver(dist_matrix):
     min_cost, path = tsp(1, 0)
     return min_cost, [0] + path
 
+
 @app.route("/solve", methods=["POST"])
 def solve():
     data = request.get_json()
@@ -41,13 +42,19 @@ def solve():
 
     total_cost, solution = traveling_salesman_solver(matrix)
 
-    print(matrix)
-    print(solution)
-
     return jsonify({"total_cost": total_cost, "solution": solution})
+
+
+@app.route("/minizinc", methods=["POST"])
+def asd():
+    data = request.get_json()
+    matrix = data.get("matrix")
+    int_matrix = [[int(value) for value in row] for row in matrix]
+
+    solution = MinizincSolver().solve(int_matrix)
+
+    return jsonify({"solution": solution})
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-# print(traveling_salesman_solver(distance_matrix))
