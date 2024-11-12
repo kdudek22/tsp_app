@@ -5,7 +5,7 @@ from minizinc import Instance, Model, Solver
 
 
 class AbstractSolver(ABC):
-    def solve(self, matrix: [[float]]) -> list[int]:
+    def solve(self, matrix: [[float]], startCity: int = 1, endCity: int = 1) -> list[int]:
         ...
 
     def assertAllUnique(self, ordering):
@@ -30,7 +30,7 @@ class OrderSolver(AbstractSolver):
 
 
 class BruteForceSolver(AbstractSolver):
-    def solve(self, matrix):
+    def solve(self, matrix: [[float]], startCity: int = 1, endCity: int = 1) -> list[int]:
         permutations = list(itertools.permutations([i for i in range(len(matrix))]))
 
         self.calculateCostFromMatrix(matrix, [0, 1, 2])
@@ -39,17 +39,25 @@ class BruteForceSolver(AbstractSolver):
 
 
 class MinizincSolver(AbstractSolver):
-    def solve(self, matrix):
+    def solve(self, matrix: [[float]], startCity: int = 0, endCity: int = 0) -> list[int]:
+        startCity += 1
+        endCity += 1
+
+        assert(0 < startCity <= len(matrix))
+        assert(0 < endCity <= len(matrix))
+
         model = Model("model.mzn")
 
         instance = Instance(Solver.lookup("chuffed"), model)
 
         instance["n"] = len(matrix)
         instance["distance"] = matrix
+        instance["startingCity"] = startCity
+        instance["endingCity"] = endCity
 
         result = instance.solve()
 
-        return [i-1 for i in result["tour"]] + [0]
+        return [i-1 for i in result["tour"]] + ([0] if startCity == endCity else [])
 
 
 if __name__ == "__main__":

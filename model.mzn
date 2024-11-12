@@ -5,6 +5,8 @@ include "alldifferent.mzn";
 %%% INPUT %%%
 int: n;  % Number of cities
 array[1..n, 1..n] of int: distance;  % Distance matrix
+int: startingCity;
+int: endingCity;
 
 
 %%% VARIABLES %%%
@@ -17,8 +19,16 @@ var int: total_cost;  % Total cost of the tour
 % Start at the first city
 constraint tour[1] = 1;
 
+% If the endCity is different from the starting city, we should finish in the last city
+constraint
+    if startingCity != endingCity then
+        tour[n] = endingCity
+    endif;
+
 % Cities do not repeat in the solution
 constraint alldifferent(tour);
+
+
 
 constraint total_cost = sum([distance[tour[i], tour[i+1]] | i in 1..n-1]);
 

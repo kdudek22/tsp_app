@@ -37,3 +37,12 @@ class TestSolver(unittest.TestCase):
 
         counter = Counter(result)
         [self.assertEqual(counter[num], 1) for num in counter]
+
+    def test_correct_last_element_if_starting_city_different_than_ending(self):
+        """If we pass the startCity and the endCity and they are different the model should adjust to the constraints"""
+        solver = MinizincSolver()
+        result = solver.solve(self.medium_matrix, startCity=0, endCity=3)
+
+        self.assertEqual(len(result), len(self.medium_matrix))
+        self.assertEqual(result[0], 0)
+        self.assertEqual(result[-1], 3)
