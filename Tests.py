@@ -46,3 +46,13 @@ class TestSolver(unittest.TestCase):
         self.assertEqual(len(result), len(self.medium_matrix))
         self.assertEqual(result[0], 0)
         self.assertEqual(result[-1], 3)
+
+    def test_returns_to_correct_city_on_provided_start_city_and_end_city(self):
+        """If we pass a startCity and an endCity and they are the same the result should have the additional route at
+        the end back to the start"""
+        solver = MinizincSolver()
+        result = solver.solve(self.medium_matrix, startCity=2, endCity=2)
+
+        self.assertEqual(len(result), len(self.medium_matrix) + 1)
+        self.assertEqual(result[0], 2)
+        self.assertEqual(result[-1], 2)

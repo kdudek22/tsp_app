@@ -57,7 +57,7 @@ class MinizincSolver(AbstractSolver):
 
         result = instance.solve()
 
-        return [i-1 for i in result["tour"]] + ([0] if startCity == endCity else [])
+        return [i-1 for i in result["tour"]] + ([startCity - 1] if startCity == endCity else [])
 
 
 if __name__ == "__main__":

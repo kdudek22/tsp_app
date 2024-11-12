@@ -17,7 +17,7 @@ var int: total_cost;  % Total cost of the tour
 %%% CONSTRAINTS %%%
 
 % Start at the first city
-constraint tour[1] = 1;
+constraint tour[1] = startingCity;
 
 % If the endCity is different from the starting city, we should finish in the last city
 constraint

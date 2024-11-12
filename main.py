@@ -49,9 +49,11 @@ def solve():
 def asd():
     data = request.get_json()
     matrix = data.get("matrix")
+    start_city = data.get("start_city", 0)
+    end_city = data.get("end_city", 0)
     int_matrix = [[int(value) for value in row] for row in matrix]
 
-    solution = MinizincSolver().solve(int_matrix)
+    solution = MinizincSolver().solve(int_matrix, start_city, end_city)
 
     return jsonify({"solution": solution})
 
