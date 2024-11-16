@@ -1,5 +1,6 @@
 import Solver from "./Solver.tsx";
 import {requestService} from "../../services/services.ts";
+import {useAppStore} from "../../store/store.tsx";
 
 type Props = {
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
@@ -11,10 +12,16 @@ type Props = {
 function MiniZincSolver({onSolverClicked, selectedSolverName, durationMatrix}: Props) {
 
     const solveTSP = async  (durationMatrix: [[number]]): Promise<number[]> => {
-        const response = await requestService.post("http://127.0.0.1:5000/minizinc", {matrix: durationMatrix})
+        let body: any = {matrix: durationMatrix}
+
+        if(!useAppStore.getState().returnToStartingPoint){
+            body = {...body, start_city: 0, end_city: durationMatrix.length - 1}
+        }
+
+        const response = await requestService.post("http://127.0.0.1:5000/minizinc", body)
 
         const data = await response.json()
-        console.log(data)
+
         return data.solution
     }
 

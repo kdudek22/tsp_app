@@ -16,8 +16,15 @@
     justify-content: center;
     border: 2px solid black;
     padding: 0.6rem;
+    background-size: cover;
 }
 
 .highlighted-marker{
     background-color: yellow;
+}
+
+.starting{
+    background: transparent url("https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Checkerboard_pattern.svg/800px-Checkerboard_pattern.svg.png");
+    background-size: cover;
+    color: transparent;
 }

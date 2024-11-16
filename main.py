@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import lru_cache
-from Solvers import MinizincSolver
+from Solvers import MinizincSolver, BruteForceSolver
 
 app = Flask(__name__)
 CORS(app)
@@ -54,6 +54,19 @@ def asd():
     int_matrix = [[int(value) for value in row] for row in matrix]
 
     solution = MinizincSolver().solve(int_matrix, start_city, end_city)
+
+    return jsonify({"solution": solution})
+
+
+@app.route("/brute_force", methods=["POST"])
+def bas():
+    data = request.get_json()
+    matrix = data.get("matrix")
+    start_city = data.get("start_city", 0)
+    end_city = data.get("end_city", 0)
+    int_matrix = [[int(value) for value in row] for row in matrix]
+
+    solution = BruteForceSolver().solve(int_matrix, start_city, end_city)
 
     return jsonify({"solution": solution})
 

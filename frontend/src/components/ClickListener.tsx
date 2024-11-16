@@ -10,7 +10,7 @@ type ClickListenerProps = {
 const ClickListener = ({onClick}: ClickListenerProps) => {
   useMapEvents({
     click(e: LeafletMouseEvent){
-      onClick({id:uuidv4(), latlang: e.latlng})
+      onClick({id:uuidv4(), latlang: e.latlng, isStart: false, isEnd: false})
     }
   })
   return null

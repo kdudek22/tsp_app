@@ -55,7 +55,7 @@ class TSPController {
         val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
 
         val response = sendPostRequest("https://api.openrouteservice.org/v2/directions/${transportType}/geojson",
-            jacksonObjectMapper().writeValueAsString(mapOf("coordinates" to transformedWaypoints + arrayOf(transformedWaypoints.first()), "radiuses" to arrayOf(-1))))
+            jacksonObjectMapper().writeValueAsString(mapOf("coordinates" to transformedWaypoints, "radiuses" to arrayOf(-1))))
 
 
         val responseString = response.body?.string() ?: "No response body"

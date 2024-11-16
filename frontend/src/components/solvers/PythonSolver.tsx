@@ -14,6 +14,7 @@ function PythonSolver({onSolverClicked, selectedSolverName, durationMatrix}: Pro
         const response = await requestService.post("http://127.0.0.1:5000/solve", {matrix: durationMatrix})
 
         const data = await response.json()
+
         return data.solution
     }
 

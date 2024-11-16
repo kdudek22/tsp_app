@@ -1,4 +1,5 @@
 import itertools
+import math
 from abc import ABC
 from collections import Counter
 from minizinc import Instance, Model, Solver
@@ -30,12 +31,23 @@ class OrderSolver(AbstractSolver):
 
 
 class BruteForceSolver(AbstractSolver):
-    def solve(self, matrix: [[float]], startCity: int = 1, endCity: int = 1) -> list[int]:
-        permutations = list(itertools.permutations([i for i in range(len(matrix))]))
+    def solve(self, matrix: [[float]], startCity: int = 0, endCity: int = 0) -> list[int]:
+        by_permutations = list(
+            itertools.permutations([i for i in range(len(matrix)) if i != startCity and i != endCity]))
 
-        self.calculateCostFromMatrix(matrix, [0, 1, 2])
+        print(len(by_permutations))
 
-        return [1]
+        permutations = [[startCity] + list(permutation) for permutation in by_permutations] if startCity == endCity else  [[startCity] + list(permutation) + [endCity] for permutation in by_permutations]
+
+        min_cost, best_one = math.inf, None
+
+        for permutation in permutations:
+            cost = self.calculateCostFromMatrix(matrix, permutation)
+            if cost < min_cost:
+                min_cost = cost
+                best_one = permutation
+
+        return best_one + ([startCity] if startCity == endCity else [])
 
 
 class MinizincSolver(AbstractSolver):

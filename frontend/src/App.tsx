@@ -51,6 +51,8 @@ function App() {
 
   const setStartSolving = useAppStore((state) => state.setStartSolving)
 
+  const returnToStartingPoint = useAppStore((state) => state.returnToStartingPoint)
+
   const solverTransportType = useAppStore((state) => state.solverTransportType)
 
     useEffect(() => {
@@ -103,7 +105,7 @@ function App() {
           ))}
 
           {/* this is the lines between the waypoints */}
-          {showLinesBetweenWaypoints && waypoints.length >= 2 && <Polyline key={linesBetweenWaypointsColor} positions={[...waypoints.map(w => w.latlang), waypoints[0].latlang]} color={linesBetweenWaypointsColor} />}
+          {showLinesBetweenWaypoints && waypoints.length >= 2 && <Polyline key={linesBetweenWaypointsColor} positions={returnToStartingPoint ? [...waypoints.map(w => w.latlang), waypoints[0].latlang] : [...waypoints.map(w => w.latlang)]} color={linesBetweenWaypointsColor} />}
 
         </MapContainer>
       </div>
@@ -112,9 +114,9 @@ function App() {
             <Settings/>
           </div>
         <div>
-          <div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>
-            <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>
-          </div>
+          {/*<div className="mt-4 overflow-auto " style={{background: "rgba(255, 255, 255, 0.7)", maxHeight: "65vh"}}>*/}
+          {/*  <WaypointList updateWaypoints={setWaypoints} waypoints={waypoints}></WaypointList>*/}
+          {/*</div>*/}
         </div>
       </div>
       {waypoints.length > 1 &&

@@ -4,6 +4,8 @@ export interface Waypoint{
     id: string
     latlang: L.LatLng
     orderNumber?: number
+    isStart: boolean
+    isEnd: boolean
 }
 
 export interface Route {

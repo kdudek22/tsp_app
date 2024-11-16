@@ -8,6 +8,7 @@ type StoreType = {
     waypoints: Waypoint[]
     addWaypoint: (waypoint: Waypoint) => void
     setWaypoints: (waypoints: Waypoint[]) => void
+    removeWaypoint: (waypointId: string) => void
 
     displayedRoutes: Route[]
     addRouteToDisplayed: (route: Route) => void
@@ -60,7 +61,7 @@ export const useAppStore = create<StoreType> ((set) => ({
     waypointToVisitOrderNumberMapping: new Map(),
     selectedSolverName: null,
     showLinesBetweenWaypoints: true,
-    linesBetweenPointsColor: "#000000",
+    linesBetweenPointsColor: "#FFF000",
 
     durationMatrix: [[]],
     distanceMatrix: [[]],
@@ -70,13 +71,17 @@ export const useAppStore = create<StoreType> ((set) => ({
 
     weightedSolveWeight: 50,
 
-    returnToStartingPoint: true,
+    returnToStartingPoint: false,
     solverTransportType: SolveTransportType.car,
 
     startSolving: false,
 
     setStartSolving: (newState) => {
         set((state) => ({startSolving: newState}))
+    },
+
+    removeWaypoint: (waypointId) => {
+        set((state) => ({waypoints: checkAndUpdateWaypoints(state.waypoints.filter(w => w.id !== waypointId), state.returnToStartingPoint)}))
     },
 
 
@@ -88,21 +93,25 @@ export const useAppStore = create<StoreType> ((set) => ({
         set((state) => ({solveFor: solveFor}))
     },
 
-
-
     // Add a waypoint, checking the current state of canAddWaypoint
     addWaypoint: (waypoint) => {
         set((state) => {
+            const newWaypoints =  [...state.waypoints, { ...waypoint, orderNumber: state.waypointNumber}]
+
+            const res = checkAndUpdateWaypoints(newWaypoints, state.returnToStartingPoint)
+
             return state.canAddWaypoints ?
-                {waypoints: [...state.waypoints, { ...waypoint, orderNumber: state.waypointNumber }],
+                {waypoints: [...res],
                     waypointNumber: state.waypointNumber + 1}
                 :
                 state
         });
     },
 
+
+
     setWaypoints: (waypoints) => {
-        set(() =>  ({waypoints: [...waypoints]}))
+        set((state) =>  ({waypoints: checkAndUpdateWaypoints([...waypoints], state.returnToStartingPoint)}))
     },
 
     setDisplayedRoutes: (routes) => {
@@ -158,7 +167,8 @@ export const useAppStore = create<StoreType> ((set) => ({
     },
 
     setReturnToStartingPoint: (newState) => {
-        set((state) => ({returnToStartingPoint: newState}))
+
+        set((state) => ({returnToStartingPoint: newState, waypoints: checkAndUpdateWaypoints(state.waypoints, newState)}))
     },
 
     setSolverTransportType: (newType) => {
@@ -167,4 +177,31 @@ export const useAppStore = create<StoreType> ((set) => ({
 
 }))
 
+const checkAndUpdateWaypoints = (waypoints: [Waypoint], returnToStart: boolean): [Waypoint] => {
+    let copy = [...waypoints]
+
+    // In case we delete the last element - just return the empty array
+    if(!copy.length){
+        return copy
+    }
+
+    // if we return to the start point, the first waypoint for now is always the one we start and return to
+    const clearedWaypoints = copy.map(w => ({...w, isStart: false, isEnd: false}))
+
+    if(returnToStart){
+        clearedWaypoints[0].isStart = true
+        clearedWaypoints[0].isEnd = true
+        return clearedWaypoints
+    }
+
+    if(clearedWaypoints.length === 1){
+        clearedWaypoints[0].isStart = true
+        return clearedWaypoints
+    }
+
+    clearedWaypoints[0].isStart = true
+    clearedWaypoints[clearedWaypoints.length - 1].isEnd = true
+
+    return clearedWaypoints
+}
 

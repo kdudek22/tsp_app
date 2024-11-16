@@ -66,6 +66,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
             lng: waypoint.latlang.lng
         }))
         const points = ordering.map(p => transformedWaypoints[p])
+
         const transportType = useAppStore.getState().solverTransportType.toString()
         const response = await requestService.post(`http://127.0.0.1:8000/api/route?transport_type=${transportType}`, points)
 
@@ -83,11 +84,6 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         const waypoints = useAppStore.getState().waypoints
 
         let solution = await solveTSP(durationMatrix)
-
-        if(!useAppStore.getState().returnToStartingPoint){
-            // In case we do not return to the starting position
-            solution = solution.splice(0, solution.length -1)
-        }
 
         let routePoints = (await getRouteFromSolution(solution, waypoints)).map(x => ({lat: x[1], lng: x[0]}))
 
@@ -118,7 +114,9 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
 
     // This maps the result and the waypoints to a map waypointId => number, that matches the result ordering
     const createWaypointToNumberMapping = (solution: number[], waypoints: Waypoint[]): Map<String, number> => {
-        return new Map(solution.slice(0, solution.length - 1).map((n, idx) => [waypoints[n].id, idx]))
+        if(useAppStore.getState().returnToStartingPoint)
+            return new Map(solution.slice(0, solution.length - 1).map((n, idx) => [waypoints[n].id, idx]))
+        return new Map(solution.map((n, idx) => [waypoints[n].id, idx]))
     }
 
     const getMetric = () => {
