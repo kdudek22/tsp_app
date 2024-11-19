@@ -37,7 +37,7 @@ fun sendPostRequest(url: String, body: String): Response{
 @RequestMapping("/api")
 class TSPController {
 
-    @PostMapping("/duration_matrix")
+    @PostMapping("/matrix")
     fun getDurationMatrix(@RequestParam(name="transport_type", defaultValue="driving-car") transportType: String, @RequestBody waypoints: List<Waypoint>): Map<String, Any> {
         val transformedWaypoints = waypoints.map{arrayOf(it.lng, it.lat)}
 
