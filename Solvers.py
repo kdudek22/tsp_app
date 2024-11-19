@@ -89,7 +89,7 @@ class DynamicSolver(AbstractSolver):
             visited_cities[len(visited_cities) - 1] = endCity
 
         def tsp(visited: list[int]):
-            if all(i != -1 for i in visited):  # if we visited all cities
+            if all(i != -1 for i in visited):
                 return visited
 
             min_cost = float("inf")
