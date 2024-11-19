@@ -18,7 +18,7 @@ function MiniZincSolver({onSolverClicked, selectedSolverName, durationMatrix}: P
             body = {...body, start_city: 0, end_city: durationMatrix.length - 1}
         }
 
-        const response = await requestService.post("http://127.0.0.1:5000/minizinc", body)
+        const response = await requestService.post("http://127.0.0.1:5000/solve?solver=minizinc", body)
 
         const data = await response.json()
 

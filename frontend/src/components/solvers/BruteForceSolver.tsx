@@ -18,7 +18,7 @@ function BruteForceSolver({onSolverClicked, selectedSolverName, durationMatrix}:
             body = {...body, start_city: 0, end_city: durationMatrix.length - 1}
         }
 
-        const response = await requestService.post("http://127.0.0.1:5000/brute_force", body)
+        const response = await requestService.post("http://127.0.0.1:5000/solve?solver=brute_force", body)
 
         const data = await response.json()
 

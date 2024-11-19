@@ -11,7 +11,7 @@ type Props = {
 function PythonSolver({onSolverClicked, selectedSolverName, durationMatrix}: Props) {
 
     const solveTSP = async  (durationMatrix: [[number]]): Promise<number[]> => {
-        const response = await requestService.post("http://127.0.0.1:5000/solve", {matrix: durationMatrix})
+        const response = await requestService.post("http://127.0.0.1:5000/solve?solver=dynamic", {matrix: durationMatrix})
 
         const data = await response.json()
 
