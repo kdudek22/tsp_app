@@ -5,7 +5,6 @@ from collections import Counter
 from minizinc import Instance, Model, Solver
 from utils import log_time
 
-
 class AbstractSolver(ABC):
     @log_time
     def solve(self, matrix: [[float]], startCity: int = 1, endCity: int = 1) -> list[int]:
@@ -57,6 +56,7 @@ class BruteForceSolver(AbstractSolver):
 class MinizincSolver(AbstractSolver):
     @log_time
     def solve(self, matrix: [[float]], startCity: int = 0, endCity: int = 0) -> list[int]:
+        matrix = [[int(value) for value in row] for row in matrix]
         startCity += 1
         endCity += 1
 
@@ -110,6 +110,11 @@ class DynamicSolver(AbstractSolver):
             return best_path
 
         return tsp(visited_cities) + ([startCity] if startCity == endCity else [])
+
+
+class BranchAndBoundSolver(AbstractSolver):
+    def solve(self, matrix: [[float]], startCity: int = 1, endCity: int = 1) -> list[int]:
+        pass
 
 
 if __name__ == "__main__":
