@@ -1,10 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import lru_cache
-from Solvers import MinizincSolver, BruteForceSolver
+from Solvers import AbstractSolver, MinizincSolver, BruteForceSolver, DynamicSolver
 
 app = Flask(__name__)
 CORS(app)
+
+
+solvers = {"minizinc": MinizincSolver, "dynamic": DynamicSolver, "brute_force": BruteForceSolver}
+
+
+def get_solver_from_name(solver_name: str) -> AbstractSolver | None:
+    """Given the solver name return the correct solver from the solvers map, if the solver name is not in the map
+    return None"""
+    return solvers[solver_name]() if solver_name in solvers else None
 
 
 def traveling_salesman_solver(dist_matrix):
@@ -40,9 +49,21 @@ def solve():
     data = request.get_json()
     matrix = data.get("matrix")
 
-    total_cost, solution = traveling_salesman_solver(matrix)
+    solver_name = request.args.get("solver")
 
-    return jsonify({"total_cost": total_cost, "solution": solution})
+    if not solver_name:
+        return jsonify({"error": f"No solver supplied, set it with the query parameter 'solver', possible options are {', '.join('\''+s+'\'' for s in solvers.keys())}"}), 400
+
+    solver = get_solver_from_name(solver_name)
+
+    if solver is None:
+        return jsonify({"error": f"No such solver: '{solver_name}', possible options are {' ,'.join('\''+s+'\'' for s in solvers.keys())}"})
+
+    solution = solver.solve(matrix)
+
+    # total_cost, solution = traveling_salesman_solver(matrix)
+
+    return jsonify({"solution": solution})
 
 
 @app.route("/minizinc", methods=["POST"])
