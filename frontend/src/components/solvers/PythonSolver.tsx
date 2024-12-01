@@ -4,22 +4,25 @@ import {requestService} from "../../services/services.ts";
 type Props = {
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
-    durationMatrix: [[number]],
 }
 
 
-function PythonSolver({onSolverClicked, selectedSolverName, durationMatrix}: Props) {
+function PythonSolver({onSolverClicked, selectedSolverName}: Props) {
 
     const solveTSP = async  (durationMatrix: [[number]]): Promise<number[]> => {
         const response = await requestService.post("http://127.0.0.1:5000/solve?solver=dynamic", {matrix: durationMatrix})
 
         const data = await response.json()
 
+        if(!response.ok){
+            throw new Error(data.error)
+        }
+
         return data.solution
     }
 
     return (
-        <Solver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#6F6FFF"} name={"Python solver"} solveTSP={solveTSP}></Solver>
+        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#6F6FFF"} name={"Python solver"} solveTSP={solveTSP}></Solver>
     );
 }
 

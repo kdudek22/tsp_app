@@ -1,61 +1,82 @@
-import {create} from 'zustand'
-import {SolveFor, SolveTransportType} from "../interfaces/Interfaces.ts";
-import {checkAndUpdateWaypoints} from "./AppStore.tsx";
-import {useAppStore} from "./AppStore.tsx";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { SolveFor, SolveTransportType } from "../interfaces/Interfaces.ts";
+import { checkAndUpdateWaypoints } from "./AppStore.tsx";
+import { useAppStore } from "./AppStore.tsx";
 
 type StoreType = {
-    showLinesBetweenWaypoints: boolean
-    setShowLinesBetweenWaypoints: (next: boolean) => void
-    linesBetweenPointsColor: string
-    setLinesBetweenPointsColor: (newColor: string) => void
+    showLinesBetweenWaypoints: boolean;
+    setShowLinesBetweenWaypoints: (next: boolean) => void;
+    linesBetweenPointsColor: string;
+    setLinesBetweenPointsColor: (newColor: string) => void;
 
-    solveFor: SolveFor
-    setSolveFor: (solveFor: SolveFor) => void
+    solveFor: SolveFor;
+    setSolveFor: (solveFor: SolveFor) => void;
 
-    weightedSolveWeight: number
-    setWeightedSolverWeight: (weight: number) => void
+    weightedSolveWeight: number;
+    setWeightedSolverWeight: (weight: number) => void;
 
-    returnToStartingPoint: boolean
-    setReturnToStartingPoint: (newState: boolean) => void
+    returnToStartingPoint: boolean;
+    setReturnToStartingPoint: (newState: boolean) => void;
 
-    solverTransportType: SolveTransportType
-    setSolverTransportType: (type: SolveTransportType) => void
-}
+    solverTransportType: SolveTransportType;
+    setSolverTransportType: (type: SolveTransportType) => void;
+};
 
-export const useSettingsStore = create<StoreType> ((set) => ({
+export const useSettingsStore = create<StoreType>()(
+    persist(
+        (set) => ({
+            showLinesBetweenWaypoints: true,
+            linesBetweenPointsColor: "#FFF000",
 
-    showLinesBetweenWaypoints: true,
-    linesBetweenPointsColor: "#FFF000",
+            setShowLinesBetweenWaypoints: (next) => {
+                set(() => ({ showLinesBetweenWaypoints: next }));
+            },
 
-    setShowLinesBetweenWaypoints: (next) => {
-        set((state) => ({showLinesBetweenWaypoints: next}))
-    },
+            setLinesBetweenPointsColor: (newColor) => {
+                set(() => ({ linesBetweenPointsColor: newColor }));
+            },
 
-    setLinesBetweenPointsColor: (newColor) => {
-        set((state) => ({linesBetweenPointsColor: newColor}))
-    },
+            solveFor: SolveFor.duration,
+            setSolveFor: (solveFor) => {
+                set(() => ({ solveFor }));
+            },
 
-    solveFor: SolveFor.duration,
-    setSolveFor: (solveFor) => {
-        set((state) => ({solveFor: solveFor}))
-    },
+            setReturnToStartingPoint: (newState) => {
+                set(() => {
+                    useAppStore.setState({... useAppStore.getState(),
+                        waypoints: checkAndUpdateWaypoints(
+                            useAppStore.getState().waypoints,
+                            newState
+                        ),
+                    });
+                    return { returnToStartingPoint: newState };
+                });
+            },
 
-    setReturnToStartingPoint: (newState) => {
-        set((state) => {
-            useAppStore.setState({waypoints: checkAndUpdateWaypoints(useAppStore.getState().waypoints, newState)})
-            return({returnToStartingPoint: newState})
-        })
-    },
+            setSolverTransportType: (newType) => {
+                set(() => ({ solverTransportType: newType }));
+            },
 
-    setSolverTransportType: (newType) => {
-        set((state) => ({solverTransportType: newType}))
-    },
+            weightedSolveWeight: 50,
+            setWeightedSolverWeight: (weight) => {
+                set(() => ({ weightedSolveWeight: weight }));
+            },
 
-    weightedSolveWeight: 50,
-    setWeightedSolverWeight: (weight) => {
-        set((state) => ({weightedSolveWeight: weight}))
-    },
-
-    returnToStartingPoint: false,
-    solverTransportType: SolveTransportType.car,
-}))
+            returnToStartingPoint: false,
+            solverTransportType: SolveTransportType.car,
+        }),
+        {
+            name: "settings-store", // Key in localStorage
+            partialize: (state) => ({
+                // Specify fields to persist
+                showLinesBetweenWaypoints: state.showLinesBetweenWaypoints,
+                linesBetweenPointsColor: state.linesBetweenPointsColor,
+                solveFor: state.solveFor,
+                returnToStartingPoint: state.returnToStartingPoint,
+                solverTransportType: state.solverTransportType,
+                weightedSolveWeight: state.weightedSolveWeight,
+            }),
+        }
+    )
+);

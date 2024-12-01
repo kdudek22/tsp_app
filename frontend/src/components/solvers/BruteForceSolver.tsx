@@ -1,16 +1,14 @@
 import Solver from "./Solver.tsx";
 import {requestService} from "../../services/services.ts";
-import {useAppStore} from "../../store/AppStore.tsx";
 import {useSettingsStore} from "../../store/SettingsStore.tsx";
 
 type Props = {
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
-    durationMatrix: [[number]],
 }
 
 
-function BruteForceSolver({onSolverClicked, selectedSolverName, durationMatrix}: Props) {
+function BruteForceSolver({onSolverClicked, selectedSolverName}: Props) {
 
     const solveTSP = async  (durationMatrix: [[number]]): Promise<number[]> => {
         let body: any = {matrix: durationMatrix}
@@ -23,11 +21,15 @@ function BruteForceSolver({onSolverClicked, selectedSolverName, durationMatrix}:
 
         const data = await response.json()
 
+        if(!response.ok){
+            throw new Error(data.error)
+        }
+
         return data.solution
     }
 
     return (
-        <Solver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#3F6333"} name={"BruteForce solver"} solveTSP={solveTSP}></Solver>
+        <Solver selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#3F6333"} name={"BruteForce solver"} solveTSP={solveTSP}></Solver>
     );
 }
 

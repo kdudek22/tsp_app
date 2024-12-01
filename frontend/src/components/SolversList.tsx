@@ -21,11 +21,11 @@ const SolversList = ({setWaypointMapping}: Props) => {
         setSelectedSolverName(solverName)
     }
 
-    const solvers = [<BasicSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
-                               <PythonSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
-                               <MiniZincSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
-                               <BruteForceSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
-                               <GeneticSolver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>]
+    const solvers = [<BasicSolver selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
+                               <PythonSolver selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
+                               <MiniZincSolver selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
+                               <BruteForceSolver selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>,
+                               <GeneticSolver selectedSolverName={selectedSolverName} isSelected={false} onSolverClicked={updateSelectedSolver}/>]
 
     return (
         <div className="border-gray-400 border-2 rounded m-3 flex flex-col divide-y divide-gray-400" style={{background: "rgba(255, 255, 255, 0.9)"}}>

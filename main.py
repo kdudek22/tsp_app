@@ -17,34 +17,6 @@ def get_solver_from_name(solver_name: str) -> AbstractSolver | None:
     return solvers[solver_name]() if solver_name in solvers else None
 
 
-def traveling_salesman_solver(dist_matrix):
-    n = len(dist_matrix)
-    all_visited = (1 << n) - 1
-
-    @lru_cache(None)
-    def tsp(mask, pos):
-        if mask == all_visited:
-            return dist_matrix[pos][0], [0]  # Return to start with the path including the starting city
-
-        min_cost = float('inf')
-        best_path = []
-
-        for city in range(n):
-            if not (mask & (1 << city)):  # If city is unvisited
-                new_cost, path = tsp(mask | (1 << city), city)
-                new_cost += dist_matrix[pos][city]
-
-                if new_cost < min_cost:
-                    min_cost = new_cost
-                    best_path = [city] + path  # Add the current city to the path
-
-        return min_cost, best_path
-
-    # Start from city 0 with only the first city visited
-    min_cost, path = tsp(1, 0)
-    return min_cost, [0] + path
-
-
 @app.route("/solve", methods=["POST"])
 def solve():
     data = request.get_json()
@@ -59,35 +31,11 @@ def solve():
 
     if solver is None:
         return jsonify({"error": f"No such solver: '{solver_name}', possible options are {' ,'.join('\''+s+'\'' for s in solvers.keys())}"})
+    try:
+        solution = solver.solve(matrix)
 
-    solution = solver.solve(matrix)
-
-    return jsonify({"solution": solution})
-
-
-
-@app.route("/minizinc", methods=["POST"])
-def asd():
-    data = request.get_json()
-    matrix = data.get("matrix")
-    start_city = data.get("start_city", 0)
-    end_city = data.get("end_city", 0)
-    int_matrix = [[int(value) for value in row] for row in matrix]
-
-    solution = MinizincSolver().solve(int_matrix, start_city, end_city)
-
-    return jsonify({"solution": solution})
-
-
-@app.route("/brute_force", methods=["POST"])
-def bas():
-    data = request.get_json()
-    matrix = data.get("matrix")
-    start_city = data.get("start_city", 0)
-    end_city = data.get("end_city", 0)
-    int_matrix = [[int(value) for value in row] for row in matrix]
-
-    solution = BruteForceSolver().solve(int_matrix, start_city, end_city)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
     return jsonify({"solution": solution})
 

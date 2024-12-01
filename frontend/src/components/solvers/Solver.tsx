@@ -10,7 +10,6 @@ import {useSettingsStore} from "../../store/SettingsStore.tsx";
 type Props = {
     name: string
     defaultColor: string
-    durationMatrix: [[number]],
     solveTSP: ([[number]]) => Promise<number[]>,
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
     selectedSolverName: string | null
@@ -20,12 +19,13 @@ enum Status{
     idle="Idle", running="Running", finished="Finished", error="Error"
 }
 
-const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverName, durationMatrix}: Props) => {
+const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverName}: Props) => {
 
     const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
     const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
     const startSolving = useAppStore((state) => state.startSolving)
     const [isHovered, setIsHovered] = useState<boolean>(false)
+    const [errorDescription, setErrorDescription] = useState("")
 
     const getMatrixToSolveFor = () => {
         if(useSettingsStore.getState().solveFor === SolveFor.distance){
@@ -45,7 +45,10 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
 
     const runSolve = async () => {
         solve(getMatrixToSolveFor())
-            .catch(e => setStatus(Status.error))
+            .catch(e => {
+                setStatus(Status.error)
+                setErrorDescription(e.toString())
+            })
     }
 
     const [route, setRoute] = useState<Route>()
@@ -91,7 +94,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         setStatus(Status.running)
         const waypoints = useAppStore.getState().waypoints
 
-        let solution = await solveTSP(durationMatrix)
+        const solution = await solveTSP(durationMatrix)
 
         let routePoints = (await getRouteFromSolution(solution, waypoints)).map(x => ({lat: x[1], lng: x[0]}))
 
@@ -138,7 +141,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
                 <div>
                     <p className="w-32">Status: {status}</p>
                     <p>Time to solve: {timeElapsed !== 0 ? `${Math.floor(timeElapsed/1000)}.${timeElapsed%1000}`: "N/A"}</p>
-                    <p>Cost: {route == undefined ? "N/A": route.totalCost.toFixed(2) + getMetric()}</p>
+                    <p>Cost: {route == undefined ? "N/A": route.totalCost.toFixed(2) + " " +  getMetric()}</p>
                     <div className="flex items-center">
                         <input disabled={ status!== Status.finished} type="checkbox" onChange={toggleDisplayRoute} checked={isDisplayed}/>
                         <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{e.preventDefault(), updateRouteColor(e.target.value)}}/>
@@ -146,7 +149,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
                 </div>
                 <div className="w-12">
                     {status === Status.running && <ClipLoader size={20} />}
-                    {status === Status.error && <p className="text-red-600">Solver Error</p>}
+                    {status === Status.error && <p className="text-red-600" title={errorDescription}>Solver Error</p>}
                 </div>
                 {isHovered &&
                     <div className="absolute top-0 right-0 mt-1 me-1" title="Rerun solver" onClick={() => runSolve()}>
