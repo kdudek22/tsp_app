@@ -47,25 +47,23 @@ def traveling_salesman_solver(dist_matrix):
 
 @app.route("/solve", methods=["POST"])
 def solve():
-    try:
-        data = request.get_json()
-        matrix = data.get("matrix")
+    data = request.get_json()
+    matrix = data.get("matrix")
 
-        solver_name = request.args.get("solver")
+    solver_name = request.args.get("solver")
 
-        if not solver_name:
-            return jsonify({"error": f"No solver supplied, set it with the query parameter 'solver', possible options are {', '.join('\''+s+'\'' for s in solvers.keys())}"}), 400
+    if not solver_name:
+        return jsonify({"error": f"No solver supplied, set it with the query parameter 'solver', possible options are {', '.join('\''+s+'\'' for s in solvers.keys())}"}), 400
 
-        solver = get_solver_from_name(solver_name)
+    solver = get_solver_from_name(solver_name)
 
-        if solver is None:
-            return jsonify({"error": f"No such solver: '{solver_name}', possible options are {' ,'.join('\''+s+'\'' for s in solvers.keys())}"})
+    if solver is None:
+        return jsonify({"error": f"No such solver: '{solver_name}', possible options are {' ,'.join('\''+s+'\'' for s in solvers.keys())}"})
 
-        solution = solver.solve(matrix)
+    solution = solver.solve(matrix)
 
-        return jsonify({"solution": solution})
-    except Exception as e:
-        print(e)
+    return jsonify({"solution": solution})
+
 
 
 @app.route("/minizinc", methods=["POST"])
