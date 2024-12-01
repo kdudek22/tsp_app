@@ -2,7 +2,7 @@ import {Waypoint} from "../interfaces/Interfaces.ts";
 import L from "leaflet";
 import {Marker, Popup} from "react-leaflet";
 import { TrashIcon } from '@heroicons/react/24/outline';
-import {useAppStore} from "../store/store.tsx";
+import {useAppStore} from "../store/AppStore.tsx";
 
 
 

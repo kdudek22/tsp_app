@@ -10,7 +10,8 @@ import ClickListener from "./components/ClickListener.tsx";
 import Settings from "./components/Settings.tsx";
 import BottomMenu from "./components/BottomMenu.tsx";
 import SolversList from "./components/SolversList.tsx";
-import {useAppStore} from "./store/store.tsx";
+import {useAppStore} from "./store/AppStore.tsx";
+import {useSettingsStore} from "./store/SettingsStore.tsx";
 import Matrix from "./components/Matrix.tsx";
 
 
@@ -37,10 +38,10 @@ function App() {
   const setWaypoints = useAppStore((state) => state.setWaypoints)
 
   // This determines wether lines between points are shown
-  const showLinesBetweenWaypoints = useAppStore((state) => state.showLinesBetweenWaypoints)
+  const showLinesBetweenWaypoints = useSettingsStore((state) => state.showLinesBetweenWaypoints)
 
   // Sets the color for lines between waypoints
-  const linesBetweenWaypointsColor = useAppStore((state) => state.linesBetweenPointsColor)
+  const linesBetweenWaypointsColor = useSettingsStore((state) => state.linesBetweenPointsColor)
 
   const setDurationMatrix = useAppStore((state) => state.setDurationMatrix)
 
@@ -51,9 +52,9 @@ function App() {
 
   const setStartSolving = useAppStore((state) => state.setStartSolving)
 
-  const returnToStartingPoint = useAppStore((state) => state.returnToStartingPoint)
+  const returnToStartingPoint = useSettingsStore((state) => state.returnToStartingPoint)
 
-  const solverTransportType = useAppStore((state) => state.solverTransportType)
+  const solverTransportType = useSettingsStore((state) => state.solverTransportType)
 
     useEffect(() => {
         getDurationMatrix()
@@ -73,7 +74,7 @@ function App() {
   const getDurationMatrix = async () => {
     const transformedWaypoints = waypoints.map(waypoint => ({id: waypoint.id, lat: waypoint.latlang.lat, lng: waypoint.latlang.lng}))
 
-    const transportType = useAppStore.getState().solverTransportType.toString()
+    const transportType = useSettingsStore.getState().solverTransportType.toString()
 
     const response = await requestService.post(`http://127.0.0.1:8000/api/matrix?transport_type=${transportType}`, transformedWaypoints)
 

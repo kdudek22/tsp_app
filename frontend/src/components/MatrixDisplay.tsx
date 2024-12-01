@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useAppStore} from "../store/store.tsx";
+import {useAppStore} from "../store/AppStore.tsx";
 
 type Props = {
     passedMatrix: [[number]]

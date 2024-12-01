@@ -1,6 +1,6 @@
 import {create} from 'zustand'
 import {Route, SolveFor, SolveTransportType, Waypoint} from "../interfaces/Interfaces.ts";
-
+import {useSettingsStore} from "./SettingsStore.tsx";
 
 type StoreType = {
     waypointNumber: number
@@ -24,11 +24,6 @@ type StoreType = {
     selectedSolverName: string | null
     setSelectedSolverName: (name: string) => void
 
-    showLinesBetweenWaypoints: boolean
-    setShowLinesBetweenWaypoints: (next: boolean) => void
-    linesBetweenPointsColor: string
-    setLinesBetweenPointsColor: (newColor: string) => void
-
     durationMatrix: [[number]]
     distanceMatrix: [[number]]
     setDurationMatrix: (newMatrix) => void,
@@ -36,17 +31,6 @@ type StoreType = {
 
     matrixHoveredGridElement: [number | null, number : null]
     setMatrixHoveredGridElement: (element: [number | null, number | null]) => void
-
-    solveFor: SolveFor
-    setSolveFor: (solveFor: SolveFor) => void
-    weightedSolveWeight: number
-    setWeightedSolverWeight: (weight: number) => void
-
-    returnToStartingPoint: boolean
-    setReturnToStartingPoint: (newState: boolean) => void
-
-    solverTransportType: SolveTransportType
-    setSolverTransportType: (type: SolveTransportType) => void
 
     startSolving: boolean
     setStartSolving: (newState: boolean) => void
@@ -81,16 +65,7 @@ export const useAppStore = create<StoreType> ((set) => ({
     },
 
     removeWaypoint: (waypointId) => {
-        set((state) => ({waypoints: checkAndUpdateWaypoints(state.waypoints.filter(w => w.id !== waypointId), state.returnToStartingPoint)}))
-    },
-
-
-    setWeightedSolverWeight: (weight) => {
-        set((state) => ({weightedSolveWeight: weight}))
-    },
-
-    setSolveFor: (solveFor) => {
-        set((state) => ({solveFor: solveFor}))
+        set((state) => ({waypoints: checkAndUpdateWaypoints(state.waypoints.filter(w => w.id !== waypointId), useSettingsStore.getState().returnToStartingPoint)}))
     },
 
     // Add a waypoint, checking the current state of canAddWaypoint
@@ -98,7 +73,7 @@ export const useAppStore = create<StoreType> ((set) => ({
         set((state) => {
             const newWaypoints =  [...state.waypoints, { ...waypoint, orderNumber: state.waypointNumber}]
 
-            const res = checkAndUpdateWaypoints(newWaypoints, state.returnToStartingPoint)
+            const res = checkAndUpdateWaypoints(newWaypoints, useSettingsStore.getState().returnToStartingPoint)
 
             return state.canAddWaypoints ?
                 {waypoints: [...res],
@@ -106,12 +81,6 @@ export const useAppStore = create<StoreType> ((set) => ({
                 :
                 state
         });
-    },
-
-
-
-    setWaypoints: (waypoints) => {
-        set((state) =>  ({waypoints: checkAndUpdateWaypoints([...waypoints], state.returnToStartingPoint)}))
     },
 
     setDisplayedRoutes: (routes) => {
@@ -146,14 +115,6 @@ export const useAppStore = create<StoreType> ((set) => ({
         set((state) => ({selectedSolverName: name}))
     },
 
-    setShowLinesBetweenWaypoints: (next) => {
-        set((state) => ({showLinesBetweenWaypoints: next}))
-    },
-
-    setLinesBetweenPointsColor: (newColor) => {
-        set((state) => ({linesBetweenPointsColor: newColor}))
-    },
-
     setDistanceMatrix: (newMatrix) => {
         set((state) => ({distanceMatrix: newMatrix}))
     },
@@ -166,18 +127,9 @@ export const useAppStore = create<StoreType> ((set) => ({
         set((state) => ({matrixHoveredGridElement: element}))
     },
 
-    setReturnToStartingPoint: (newState) => {
-
-        set((state) => ({returnToStartingPoint: newState, waypoints: checkAndUpdateWaypoints(state.waypoints, newState)}))
-    },
-
-    setSolverTransportType: (newType) => {
-        set((state) => ({solverTransportType: newType}))
-    }
-
 }))
 
-const checkAndUpdateWaypoints = (waypoints: [Waypoint], returnToStart: boolean): [Waypoint] => {
+export const checkAndUpdateWaypoints = (waypoints: [Waypoint], returnToStart: boolean): [Waypoint] => {
     let copy = [...waypoints]
 
     // In case we delete the last element - just return the empty array

@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Cog6ToothIcon} from "@heroicons/react/24/outline";
 import Modal from 'react-modal';
 import "react-toggle/style.css"
-import {useAppStore} from "../store/store.tsx";
+import {useSettingsStore} from "../store/SettingsStore.tsx";
 import {SolveFor, SolveTransportType} from "../interfaces/Interfaces.ts";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import PedestrianIcon from "@mui/icons-material/DirectionsWalk";
@@ -11,18 +11,18 @@ Modal.setAppElement("#root");
 
 function Settings() {
     const [isOpen, setIsOpen] = useState(false)
-    const showLinesBetweenPoints = useAppStore((state) => state.showLinesBetweenWaypoints)
-    const setShowLinesBetweenPoints = useAppStore((state) => state.setShowLinesBetweenWaypoints)
-    const setLinesBetweenPointsColor = useAppStore((state) => state.setLinesBetweenPointsColor)
-    const linesBetweenPointsColor = useAppStore((state) => state.linesBetweenPointsColor)
-    const solveFor = useAppStore((state) => state.solveFor)
-    const setSolveFor = useAppStore((state) => state.setSolveFor)
-    const weightedSolveWeight = useAppStore((state) => state.weightedSolveWeight)
-    const setWeightedSolverWeight = useAppStore((state) => state.setWeightedSolverWeight)
-    const returnToStartingPoint = useAppStore((state) => state.returnToStartingPoint)
-    const setReturnToStartingPoint = useAppStore((state) => state.setReturnToStartingPoint)
-    const solverTransportType = useAppStore((state) => state.solverTransportType)
-    const setSolverTransportType = useAppStore((state) => state.setSolverTransportType)
+    const showLinesBetweenPoints = useSettingsStore((state) => state.showLinesBetweenWaypoints)
+    const setShowLinesBetweenPoints = useSettingsStore((state) => state.setShowLinesBetweenWaypoints)
+    const setLinesBetweenPointsColor = useSettingsStore((state) => state.setLinesBetweenPointsColor)
+    const linesBetweenPointsColor = useSettingsStore((state) => state.linesBetweenPointsColor)
+    const solveFor = useSettingsStore((state) => state.solveFor)
+    const setSolveFor = useSettingsStore((state) => state.setSolveFor)
+    const weightedSolveWeight = useSettingsStore((state) => state.weightedSolveWeight)
+    const setWeightedSolverWeight = useSettingsStore((state) => state.setWeightedSolverWeight)
+    const returnToStartingPoint = useSettingsStore((state) => state.returnToStartingPoint)
+    const setReturnToStartingPoint = useSettingsStore((state) => state.setReturnToStartingPoint)
+    const solverTransportType = useSettingsStore((state) => state.solverTransportType)
+    const setSolverTransportType = useSettingsStore((state) => state.setSolverTransportType)
 
 
     return (

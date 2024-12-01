@@ -1,5 +1,6 @@
 import Solver from "./Solver.tsx";
-import {useAppStore} from "../../store/store.tsx";
+import {useAppStore} from "../../store/AppStore.tsx";
+import {useSettingsStore} from "../../store/SettingsStore.tsx";
 
 type Props = {
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
@@ -11,7 +12,7 @@ type Props = {
 function BasicSolver({waypoints, onSolverClicked, selectedSolverName, durationMatrix}: Props) {
 
     const solveTSP = (durationMatrix: [[number]]): Promise<number[]> => {
-        const returnToStartingPoint = useAppStore.getState().returnToStartingPoint
+        const returnToStartingPoint = useSettingsStore.getState().returnToStartingPoint
 
         if(returnToStartingPoint) {
             return Promise.resolve([...Array.from({length: durationMatrix.length}, (_, index) => index), 0])

@@ -1,6 +1,7 @@
 import Solver from "./Solver.tsx";
 import {requestService} from "../../services/services.ts";
-import {useAppStore} from "../../store/store.tsx";
+import {useAppStore} from "../../store/AppStore.tsx";
+import {useSettingsStore} from "../../store/SettingsStore.tsx";
 
 type Props = {
     onSolverClicked: (solverId: string, waypointMapping: Map<string, number>) => void
@@ -14,7 +15,7 @@ function GeneticSolver({onSolverClicked, selectedSolverName, durationMatrix}: Pr
     const solveTSP = async  (durationMatrix: [[number]]): Promise<number[]> => {
         let body: any = {matrix: durationMatrix}
 
-        if(!useAppStore.getState().returnToStartingPoint){
+        if(!useSettingsStore.getState().returnToStartingPoint){
             body = {...body, start_city: 0, end_city: durationMatrix.length - 1}
         }
 

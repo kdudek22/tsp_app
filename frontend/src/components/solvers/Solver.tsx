@@ -3,8 +3,9 @@ import {ClipLoader} from "react-spinners";
 import {Route, SolveFor, Waypoint} from "../../interfaces/Interfaces.ts";
 import {v4 as uuidv4} from 'uuid';
 import {requestService} from "../../services/services.ts";
-import {useAppStore} from "../../store/store.tsx";
+import {useAppStore} from "../../store/AppStore.tsx";
 import {ArrowPathIcon} from "@heroicons/react/24/outline";
+import {useSettingsStore} from "../../store/SettingsStore.tsx";
 
 type Props = {
     name: string
@@ -27,10 +28,10 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     const [isHovered, setIsHovered] = useState<boolean>(false)
 
     const getMatrixToSolveFor = () => {
-        if(useAppStore.getState().solveFor === SolveFor.distance){
+        if(useSettingsStore.getState().solveFor === SolveFor.distance){
                 return useAppStore.getState().distanceMatrix
         }
-        else if(useAppStore.getState().solveFor === SolveFor.duration){
+        else if(useSettingsStore.getState().solveFor === SolveFor.duration){
             return useAppStore.getState().durationMatrix
         }
         return useAppStore.getState().durationMatrix
@@ -74,7 +75,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         }))
         const points = ordering.map(p => transformedWaypoints[p])
 
-        const transportType = useAppStore.getState().solverTransportType.toString()
+        const transportType = useSettingsStore.getState().solverTransportType.toString()
         const response = await requestService.post(`http://127.0.0.1:8000/api/route?transport_type=${transportType}`, points)
 
         const data = await response.json()
@@ -121,13 +122,13 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
 
     // This maps the result and the waypoints to a map waypointId => number, that matches the result ordering
     const createWaypointToNumberMapping = (solution: number[], waypoints: Waypoint[]): Map<String, number> => {
-        if(useAppStore.getState().returnToStartingPoint)
+        if(useSettingsStore.getState().returnToStartingPoint)
             return new Map(solution.slice(0, solution.length - 1).map((n, idx) => [waypoints[n].id, idx]))
         return new Map(solution.map((n, idx) => [waypoints[n].id, idx]))
     }
 
     const getMetric = () => {
-        return useAppStore.getState().solveFor == SolveFor.duration ? "seconds" : "meters"
+        return useSettingsStore.getState().solveFor == SolveFor.duration ? "seconds" : "meters"
     }
 
     return (
