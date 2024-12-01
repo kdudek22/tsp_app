@@ -4,6 +4,7 @@ import {Route, SolveFor, Waypoint} from "../../interfaces/Interfaces.ts";
 import {v4 as uuidv4} from 'uuid';
 import {requestService} from "../../services/services.ts";
 import {useAppStore} from "../../store/store.tsx";
+import {ArrowPathIcon} from "@heroicons/react/24/outline";
 
 type Props = {
     name: string
@@ -15,7 +16,7 @@ type Props = {
 }
 
 enum Status{
-    idle="Idle", running="Running", finished="Finished"
+    idle="Idle", running="Running", finished="Finished", error="Error"
 }
 
 const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverName, durationMatrix}: Props) => {
@@ -23,6 +24,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     const removeRouteFromDisplayed = useAppStore((state) => state.removeRouteFromDisplayed)
     const addRouteToDisplayedRoutes = useAppStore((state) => state.addRouteToDisplayed)
     const startSolving = useAppStore((state) => state.startSolving)
+    const [isHovered, setIsHovered] = useState<boolean>(false)
 
     const getMatrixToSolveFor = () => {
         if(useAppStore.getState().solveFor === SolveFor.distance){
@@ -36,12 +38,16 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
 
     useEffect(() => {
         if (startSolving) {
-            solve(getMatrixToSolveFor())
+            runSolve()
         }
     }, [startSolving]);
 
+    const runSolve = async () => {
+        solve(getMatrixToSolveFor())
+            .catch(e => setStatus(Status.error))
+    }
+
     const [route, setRoute] = useState<Route>()
-    const [isRunning, setIsRunning] = useState(false)
     const [status, setStatus] = useState(Status.idle)
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [isDisplayed, setIsDisplayed] = useState<boolean>(false)
@@ -50,14 +56,15 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
 
     useEffect(() => {
         let timerId;
-        if (isRunning) {
+        if (status === Status.running) {
+            setTimeElapsed(0)
             timerId = setInterval(() => {
                 setTimeElapsed((prevTime) => prevTime + 10);
             }, 10);
         }
 
         return () => clearInterval(timerId);
-    }, [isRunning]);
+    }, [status]);
 
     const getRouteFromSolution = async (ordering: number[], waypoints: Waypoint[]) => {
         const transformedWaypoints = waypoints.map(waypoint => ({
@@ -80,7 +87,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     }
 
     const solve = async (durationMatrix: [[number]]) => {
-        setIsRunning(true); setStatus(Status.running)
+        setStatus(Status.running)
         const waypoints = useAppStore.getState().waypoints
 
         let solution = await solveTSP(durationMatrix)
@@ -90,7 +97,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         const route: Route = {id: uuidv4(), color: color, solution: solution, totalCost: calculateCost(solution, durationMatrix), points: routePoints}
 
         addRouteToDisplayedRoutes(route)
-        setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setIsRunning(false); setWaypointToNumberMapping(createWaypointToNumberMapping(solution, waypoints))
+        setRoute(route); setIsDisplayed(true); setStatus(Status.finished); setWaypointToNumberMapping(createWaypointToNumberMapping(solution, waypoints))
     }
 
     const toggleDisplayRoute = () => {
@@ -124,9 +131,9 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
     }
 
     return (
-        <div className={`flex flex-col text-xs py-3 px-4`} style={{background: selectedSolverName === name  && status === Status.finished ? "rgba(102, 204, 255, 0.5)" : ""}} onClick={() => status === Status.finished? onSolverClicked(name, waypointToNumberMapping) : null}>
+        <div className="fex flex-col text-xs py-3 px-4 relative" style={{background: selectedSolverName === name  && status === Status.finished ? "rgba(102, 204, 255, 0.5)" : ""}} onClick={() => status === Status.finished? onSolverClicked(name, waypointToNumberMapping) : null} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)}>
             <h2 className="font-bold">{name}</h2>
-            <div className="flex justify-between gap-3">
+            <div className="flex justify-between items-center gap-3">
                 <div>
                     <p className="w-32">Status: {status}</p>
                     <p>Time to solve: {timeElapsed !== 0 ? `${Math.floor(timeElapsed/1000)}.${timeElapsed%1000}`: "N/A"}</p>
@@ -136,9 +143,15 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
                         <input className="w-4 h-4" type="color" defaultValue={color} onChange={(e)=>{e.preventDefault(), updateRouteColor(e.target.value)}}/>
                     </div>
                 </div>
-                <div style={{ width: '50px', height: '50px' }}>
-                    {isRunning && <ClipLoader size={20} />}
+                <div className="w-12">
+                    {status === Status.running && <ClipLoader size={20} />}
+                    {status === Status.error && <p className="text-red-600">Solver Error</p>}
                 </div>
+                {isHovered &&
+                    <div className="absolute top-0 right-0 mt-1 me-1" title="Rerun solver" onClick={() => runSolve()}>
+                        <ArrowPathIcon className="w-3 h-3"/>
+                    </div>
+                }
             </div>
         </div>
     );

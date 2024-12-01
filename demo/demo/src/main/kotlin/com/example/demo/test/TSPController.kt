@@ -20,8 +20,6 @@ fun sendPostRequest(url: String, body: String): Response{
     val client = OkHttpClient()
     val requestBody = body.toRequestBody()
 
-    println(requestBody)
-
     val request = Request.Builder()
         .url(url)
         .post(requestBody)
@@ -46,7 +44,6 @@ class TSPController {
 
         val responseString = response.body?.string() ?: "No response body"
 
-        println(responseString)
         return mapOf("response" to responseString)
     }
 

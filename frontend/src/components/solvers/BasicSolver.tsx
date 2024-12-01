@@ -21,7 +21,7 @@ function BasicSolver({waypoints, onSolverClicked, selectedSolverName, durationMa
     }
 
     return (
-        <Solver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Basic solver"} solveTSP={solveTSP} waypoints={waypoints}></Solver>
+        <Solver durationMatrix={durationMatrix} selectedSolverName={selectedSolverName} onSolverClicked={onSolverClicked} defaultColor={"#000000"} name={"Order solver"} solveTSP={solveTSP} waypoints={waypoints}></Solver>
     );
 }
 
