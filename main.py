@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import lru_cache
-from Solvers import AbstractSolver, MinizincSolver, BruteForceSolver, DynamicSolver
+from Solvers import AbstractSolver, MinizincSolver, BruteForceSolver, DynamicSolver, GeneticSolver
 
 app = Flask(__name__)
 CORS(app)
 
 
-solvers = {"minizinc": MinizincSolver, "dynamic": DynamicSolver, "brute_force": BruteForceSolver}
+solvers = {"minizinc": MinizincSolver, "dynamic": DynamicSolver, "brute_force": BruteForceSolver,
+           "genetic": GeneticSolver}
 
 
 def get_solver_from_name(solver_name: str) -> AbstractSolver | None:
@@ -60,8 +61,6 @@ def solve():
         return jsonify({"error": f"No such solver: '{solver_name}', possible options are {' ,'.join('\''+s+'\'' for s in solvers.keys())}"})
 
     solution = solver.solve(matrix)
-
-    # total_cost, solution = traveling_salesman_solver(matrix)
 
     return jsonify({"solution": solution})
 
