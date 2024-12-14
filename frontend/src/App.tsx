@@ -76,7 +76,7 @@ function App() {
 
     const transportType = useSettingsStore.getState().solverTransportType.toString()
 
-    const response = await requestService.post(`http://127.0.0.1:8000/api/matrix?transport_type=${transportType}`, transformedWaypoints)
+    const response = await requestService.post(`http://127.0.0.1:7999/api/matrix?transport_type=${transportType}`, transformedWaypoints)
 
     const data = await response.json()
     const jsonData = JSON.parse(data.response)

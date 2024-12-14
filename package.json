@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "animated-number-react": "^0.1.2",
-    "leaflet": "^1.9.4",
-    "react-leaflet": "^4.2.1",
-    "react-spinners": "^0.14.1"
-  }
-}

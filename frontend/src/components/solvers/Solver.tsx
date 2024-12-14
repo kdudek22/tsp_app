@@ -79,7 +79,7 @@ const Solver = ({name, defaultColor, solveTSP, onSolverClicked, selectedSolverNa
         const points = ordering.map(p => transformedWaypoints[p])
 
         const transportType = useSettingsStore.getState().solverTransportType.toString()
-        const response = await requestService.post(`http://127.0.0.1:8000/api/route?transport_type=${transportType}`, points)
+        const response = await requestService.post(`http://127.0.0.1:7999/api/route?transport_type=${transportType}`, points)
 
         const data = await response.json()
         const geometries: [[number]] = JSON.parse(data.response).features[0].geometry.coordinates
