@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from functools import lru_cache
 from Solvers import AbstractSolver, MinizincSolver, BruteForceSolver, DynamicSolver, GeneticSolver, OrderSolver
 
 app = Flask(__name__)
